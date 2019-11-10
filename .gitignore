@@ -1,5 +1,6 @@
 node_modules
 _docs
-data_entry/javascript/*
+data_entry/javascript
 data_entry/package-lock.json
 data_entry/demotexts.ts
+data_entry/javascript/demotexts.js
