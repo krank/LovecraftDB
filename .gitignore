@@ -1,5 +1,5 @@
 node_modules
 _docs
-javascript/*
-package-lock.json
-demotexts.ts
+data_entry/javascript/*
+data_entry/package-lock.json
+data_entry/demotexts.ts
