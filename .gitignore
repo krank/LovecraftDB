@@ -1,0 +1,5 @@
+node_modules
+_docs
+javascript/*
+package-lock.json
+demotexts.ts

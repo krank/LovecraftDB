@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>LovecraftDB</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://kit.fontawesome.com/ab420e9236.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="javascript/script.js"></script>
+</head>
+
+<body>
+    <section class="toolbar">
+        <section class="document-links">
+            <button title="Get text from Wikisource" type="button" class="wikisource">
+                <img src="media/32px-Wikisource-logo.svg.webp">
+            </button>
+        </section>
+
+        <section class="file-management">
+            <button title="Clear all fields" type="button" class="clear fas fa-trash-alt"></button>
+            <button title="Save as XML" type="button" class="export fas fa-file-download"></button>
+            <button title="Load XML" type="button" class="import fas fa-file-upload"></button>
+        </section>
+    </section>
+
+
+
+    <main>
+        <h2 class="summary-heading">Summary</h2>
+        <textarea class="summary"></textarea>
+        <h2 class="text-heading">Full text</h2>
+        <textarea class="text"></textarea>
+    </main>
+
+    <section class="metadata">
+        <section class="publication_info">
+            <h2>Publication info</h2>
+            <label class="title">
+                <span>Title</span>
+                <input type="text" name="title">
+            </label>
+            <label class="author">
+                <span>Author</span>
+                <input type="text" name="author">
+            </label>
+            <label class="written">
+                <span>Written date</span>
+                <input type="text" name="written">
+            </label>
+            <label class="published">
+                <span>Published date</span>
+                <input type="text" name="published">
+            </label>
+        </section>
+
+        <section class="tags">
+            <h2>Tags</h2>
+            <textarea></textarea>
+        </section>
+        <section class="characters">
+            <h2>Characters</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="creatures">
+            <h2>Creatures</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="books">
+            <h2>Books</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="locations">
+            <h2>Locations</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="phobias">
+            <h2>Phobias</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="notes">
+            <h2>Notes</h2>
+            <textarea></textarea>
+        </section>
+
+        <section class="related-links">
+            <h2>Related links</h2>
+            <textarea></textarea>
+        </section>
+
+    </section>
+
+    <dialog class="big wikisource">
+        <section>
+            <form method="dialog">
+                <header>
+                    <h2>Download from Wikisource</h2>
+
+                    <button type="submit" value="cancel" class="fas fa-times"></button>
+
+                </header>
+            </form>
+
+            <form action="#" class="search-box">
+                <input class="query" type="text" placeholder="Type your query here…" name="search" minlength="2"
+                    required>
+                <button type="submit" class="fas fa-search" disabled></button>
+            </form>
+
+            <form method="dialog" class="search-results">
+
+                <section class="results">
+                </section>
+
+                <section class="buttons">
+                    <button title="Download and append to text" type="submit" value="append"
+                        class="fas fa-plus">Append</button>
+                    <button title="Download and replace current text" type="submit" value="replace"
+                        class="fas fa-arrow-alt-circle-down">Replace</button>
+                </section>
+
+            </form>
+
+            <template class="result-row">
+                <label>
+                    <input type="radio" name="title" value="Dagon" required>
+                    <span class="fas fa-check-circle"></span>
+                    <span class="title">Dagon</span>
+                </label>
+            </template>
+        </section>
+    </dialog>
+
+    <dialog class="decision">
+        <section>
+            <h2>Title</h2>
+            <p>Text</p>
+        </section>
+        <form method="dialog">
+            <section class="buttons">
+                <button title="Yes" type="submit" value="yes" class="fas fa-check">Yes</button>
+                <button title="No" type="submit" value="no" class="fas fa-times">No</button>
+            </section>
+        </form>
+    </dialog>
+
+</body>
+
+</html>
