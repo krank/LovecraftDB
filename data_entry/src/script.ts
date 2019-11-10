@@ -882,7 +882,7 @@ namespace MediaWikiSearch {
                 if (page.revisions) {
                     const text: string = page.revisions[0].slots.main["*"];
                     const convertedText: string = wikiToXML(text);
-                    resultHandler(text, replace);
+                    resultHandler(wikiToXML(text), replace);
                 }
             });
 

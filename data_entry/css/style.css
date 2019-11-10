@@ -239,6 +239,8 @@ dialog section.buttons {
     padding-right: 0.5em;
     border-top: 1px solid #ccc;
     padding-top: 0.5em;
+    padding-bottom: 1em;
+    flex-shrink: 0;
 }
 
 dialog section.buttons button::before {
