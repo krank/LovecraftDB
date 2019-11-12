@@ -660,7 +660,7 @@ namespace MediaWikiSearch {
             titles.forEach(title => {
                 let row = template.cloneNode(true) as HTMLTemplateElement;
 
-                row.querySelector(".title").innerHTML = title;
+                row.querySelector(".text").innerHTML = title;
                 (row.querySelector("input[name=title]") as HTMLInputElement).value = title;
 
                 container.appendChild(row);

@@ -438,7 +438,7 @@ var MediaWikiSearch;
         else {
             titles.forEach(function (title) {
                 var row = template.cloneNode(true);
-                row.querySelector(".title").innerHTML = title;
+                row.querySelector(".text").innerHTML = title;
                 row.querySelector("input[name=title]").value = title;
                 container.appendChild(row);
             });

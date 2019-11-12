@@ -204,7 +204,6 @@ dialog.big section.results {
 dialog.big section.results label {
     display: flex;
     cursor: pointer;
-    padding-left: 0.5em;
 }
 
 dialog.big section.results label:hover {
@@ -220,17 +219,79 @@ dialog.big section.results input[type="radio"] {
     display: none;
 }
 
-dialog.big section.results span.title {
-    display: block;
+dialog.big section.results span.text {
+    display: flex;
     line-height: 2em;
     margin-bottom: 0.25em;
-    padding-left: 0.75em;
+    padding-right: 0.6em;
 }
 
-dialog.big section.results input:checked + span.fas {
+/* #endregion */
+
+input[type="radio"] ~ span.text::before {
+    font-family: "Font Awesome 5 Pro";
+    content: "";
+    font-weight: 900;
+    opacity: 0.2;
+    line-height:2;
+    width: 2em;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+}
+
+input[type="radio"]:checked ~ span.text::before,
+section.results label:hover input[type="radio"] ~ span.text::before {
     opacity: 1;
 }
+
+
+/* #region Dialog Complex results */
+
+dialog.big section.results li,
+dialog.big section.results section.item-options {
+    display: flex;
+}
+
+dialog.big section.results ul li:hover {
+    border-bottom: 1px solid black;
+}
+
+dialog.big section.results ul {
+    margin-right: 4em;
+    padding-left: 0;
+}
+
+dialog.big section.results ul li > span {
+    flex-grow:1;
+}
+
 /* #endregion */
+
+input[type="radio"][value=character] ~ span.text::before
+{
+    content: "";
+}
+
+input[type="radio"][value=creature] ~ span.text::before
+{
+    content: "";
+}
+
+input[type="radio"][value=location] ~ span.text::before
+{
+    content: "";
+}
+
+input[type="radio"][value=book] ~ span.text::before
+{
+    content: "";
+}
+
+input[type="radio"][value=ignore] ~ span.text::before
+{
+    content: "";
+}
 
 /* #region Dialog buttons */
 
@@ -263,17 +324,22 @@ dialog section.buttons button:hover {
 @media screen and (max-width: 800px) {
     body {
         grid-template-columns: 100%;
-        /*grid-template-columns:
-            minmax(0, auto)
-            minmax(auto, 640px)
-            minmax(auto, 320px)
-            minmax(0, auto);*/
         grid-template-rows: auto 1fr;
 
         grid-template-areas:
             "toolbar"
             "meta"
             "text";
+    }
+
+    dialog.big section.results section.item-options span.text {
+        width: 2em;
+        overflow: hidden;
+        color: transparent;
+        padding-right: 0;
+    }
+    dialog.big section.results section.item-options span.text::before {
+        color: #000;
     }
 
     section.metadata {
@@ -301,4 +367,7 @@ dialog section.buttons button:hover {
         padding-left: 1em;
         padding-right: 1em;
     }
+
+
+
 }

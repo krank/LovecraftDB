@@ -101,7 +101,7 @@
 
     </section>
 
-    <dialog class="big wikisource">
+    <dialog class="big search wikisource">
         <section>
             <form method="dialog">
                 <header>
@@ -135,11 +135,74 @@
             <template class="result-row">
                 <label>
                     <input type="radio" name="title" value="Dagon" required>
+                    <span class="text">Dagon</span>
+                </label>
+            </template>
+        </section>
+    </dialog>
+
+    <dialog class="big complex">
+        <section>
+            <form method="dialog">
+                <header>
+                    <h2>Detected characters</h2>
+
+                    <button type="submit" value="cancel" class="fas fa-times"></button>
+
+                </header>
+            </form>
+
+            <form method="dialog" class="search-results">
+                <section class="results">
+                    <ul>
+                        <li>
+                            <span class="text name">Herbert West, Re-animator</span>
+                            <section class="item-options">
+                                <label>
+                                    <input type="radio" name="herbert" value="character" required>
+                                    <span class="text">Character</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="herbert" value="creature" required>
+                                    <span class="text">Creature</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="herbert" value="location" required>
+                                    <span class="text">Location</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="herbert" value="book" required>
+                                    <span class="text">Book</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="herbert" value="ignore" required>
+                                    <span class="text">Ignore</span>
+                                </label>
+                            </section>
+                        </li>
+                    </ul>
+
+                </section>
+
+                <section class="buttons">
+                    <button title="Download and append to text" type="submit" value="append" class="fas fa-plus">Insert
+                        into lists</button>
+                    <button title="Download and replace current text" type="submit" value="replace"
+                        class="fas fa-ban">Cancel</button>
+                </section>
+
+            </form>
+
+            <template class="result-row">
+                <label>
+                    <input type="radio" name="title" value="Dagon" required>
                     <span class="fas fa-check-circle"></span>
                     <span class="title">Dagon</span>
                 </label>
             </template>
         </section>
+
+
     </dialog>
 
     <dialog class="decision">
