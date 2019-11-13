@@ -3,8 +3,10 @@
 
 // TODO: Full text preview using XSLT
 
-// TODO: Text fields: Sort, remove duplicates, remove empty
+// TODO: Consolidate big dialogs?
+// TODO: Programmatically construct metadata column contents
 // TODO: Use title for default search
+// TODO: Text fields: Sort, remove duplicates, remove empty
 // TODO: Make XML error more specific (where is the error?)
 
 // TODO: Prettyprint the XML: http://www.eslinstructor.net/vkbeautify/
@@ -26,8 +28,10 @@ interface Globals {
 window.addEventListener("load", function() {
     setupGlobalElements();
 
-    MediaWikiSearch.SetupDialog("dialog.wikisource", "template.result-row");
+    MediaWikiSearch.setupDialog("dialog.wikisource", "template.result-row");
     XMlHandling.setupXMLValidation();
+
+    //NameSearch.setupDialog("dialog.complex", "template.result-row");
 
     setupToolbar();
 });
@@ -67,6 +71,11 @@ function setupToolbar() {
         event.preventDefault();
 
         MediaWikiSearch.displayDialog("https://en.wikisource.org", "dialog.wikisource", SetTextBody);
+    });
+
+    document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
+        event.preventDefault();
+        NameSearch.displayDialog("dialog.complex", globals.textBodyElement.value);
     });
 
     document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {
@@ -546,7 +555,7 @@ namespace MediaWikiSearch {
         wikiDialog?: WikiDialog;
     }
 
-    export function SetupDialog(dialogQuery: string, resultRowTemplateQuery: string) {
+    export function setupDialog(dialogQuery: string, resultRowTemplateQuery: string) {
         let dialog: WikiDialog = document.querySelector(dialogQuery);
 
         dialog.resultRowTemplate = dialog.querySelector(resultRowTemplateQuery) as HTMLTemplateElement;
@@ -575,19 +584,19 @@ namespace MediaWikiSearch {
         });
 
         // Result selected
-        document.querySelector("dialog.wikisource").addEventListener("close", function() {
+        dialog.addEventListener("close", function() {
             let dialog = this as WikiDialog;
 
             if (dialog.returnValue != "cancel") {
-                let selectedItem = this.querySelector(".results input[type=radio][name=title]:checked");
+                let selectedItem:HTMLInputElement = dialog.querySelector(".results input[type=radio][name=title]:checked");
                 if (selectedItem) {
                     let title: string = selectedItem.value;
 
-                    let wikiUrl = (this as WikiDialog).wikiUrl;
+                    let wikiUrl = dialog.wikiUrl;
 
-                    if (this.returnValue == "replace") {
+                    if (dialog.returnValue == "replace") {
                         getMediaWikiText(title, wikiUrl, true, dialog.callback);
-                    } else if (this.returnValue == "append") {
+                    } else if (dialog.returnValue == "append") {
                         getMediaWikiText(title, wikiUrl, false, dialog.callback);
                     } else {
                         alert("Whatcho talkin bout Willis?");
@@ -888,6 +897,108 @@ namespace MediaWikiSearch {
 
         // TODO: Add some error handling here. Catch?
     }
+}
+
+namespace NameSearch {
+
+    /* 
+        Needed from outside/config:
+        - Init: declarations, adding validations, preparations, search box etc.
+        - Submit button handlers: Button names + click functions
+
+        Similarities between dialogs:
+        - Validation of forms
+        - Same HTML
+        - Have results
+
+        Differences between dialogs:
+        - Startup action
+        - Events
+        - Results
+        - Buttons (actions when closing dialog)
+    */
+
+    interface DialogOptions {
+        dialogQuery
+    }
+
+    interface ComplexDialog extends HTMLDialogElement {
+        wikiUrl?: string;
+        resultRowTemplate: HTMLTemplateElement;
+        query?: string;
+        callback?: (text: string, replace: boolean) => void;
+    }
+
+    interface Group {
+        match: string,
+        indexStart: number,
+        indexEnd: number
+    }
+
+    export function displayDialog(dialogQuery: string, text: string) {
+
+        const dialog: ComplexDialog = document.querySelector(dialogQuery);
+        const resultsContainer:HTMLElement = dialog.querySelector(".results ul");
+        const resultsForm: HTMLFormElement = dialog.querySelector("form.search-results") as HTMLFormElement;
+
+        dialog.querySelector("header h2").innerHTML = "Detected names"
+
+        resultsContainer.innerHTML = "";
+
+
+        // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
+        // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
+        let nameRegex: RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+)/g;
+
+        let possibleNames:Group[] = [];
+
+        let groups:RegExpExecArray;
+
+        let foundNames:string[] = [];
+        while ((groups = nameRegex.exec(text)) !== null) {
+            let match:string = groups[1].trim();
+
+            if (foundNames.indexOf(match) < 0) {
+                foundNames.push(match);
+                possibleNames.push({
+                    match: groups[1].trim(),
+                    indexStart: groups.index,
+                    indexEnd: nameRegex.lastIndex
+                })
+            }
+        }
+
+        if (possibleNames.length > 0) {
+            const template:HTMLTemplateElement = dialog.querySelector(".complex-result-row");
+
+            possibleNames.forEach(possibleName => {
+                const rowElement: DocumentFragment = document.importNode(template.content, true);
+
+                const textElement:HTMLElement = rowElement.querySelector(".description");
+
+                textElement.innerText = possibleName.match;
+
+
+                const inputElements: NodeListOf<HTMLInputElement> = rowElement.querySelectorAll("input[type=radio]");
+
+                inputElements.forEach(inputElement => {
+                    inputElement.setAttribute("name", possibleName.match);
+                })
+
+
+                resultsContainer.appendChild(rowElement);
+
+            });
+
+        }
+
+        
+
+
+        dialog.showModal();
+
+    }
+
 }
 
 namespace FormHandling {

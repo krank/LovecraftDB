@@ -1,7 +1,7 @@
 var globals;
 window.addEventListener("load", function () {
     setupGlobalElements();
-    MediaWikiSearch.SetupDialog("dialog.wikisource", "template.result-row");
+    MediaWikiSearch.setupDialog("dialog.wikisource", "template.result-row");
     XMlHandling.setupXMLValidation();
     setupToolbar();
 });
@@ -33,6 +33,10 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", function (event) {
         event.preventDefault();
         MediaWikiSearch.displayDialog("https://en.wikisource.org", "dialog.wikisource", SetTextBody);
+    });
+    document.querySelector("section.toolbar button.find-names").addEventListener("click", function (event) {
+        event.preventDefault();
+        NameSearch.displayDialog("dialog.complex", globals.textBodyElement.value);
     });
     document.querySelector("section.toolbar button.export").addEventListener("click", function (event) {
         event.preventDefault();
@@ -366,7 +370,7 @@ var DecisionDialog;
 })(DecisionDialog || (DecisionDialog = {}));
 var MediaWikiSearch;
 (function (MediaWikiSearch) {
-    function SetupDialog(dialogQuery, resultRowTemplateQuery) {
+    function setupDialog(dialogQuery, resultRowTemplateQuery) {
         var dialog = document.querySelector(dialogQuery);
         dialog.resultRowTemplate = dialog.querySelector(resultRowTemplateQuery);
         FormHandling.addValidation(dialog.querySelector("form.search-box"));
@@ -380,17 +384,17 @@ var MediaWikiSearch;
             dialog.query = query;
             searchMediaWiki(query, dialog);
         });
-        document.querySelector("dialog.wikisource").addEventListener("close", function () {
+        dialog.addEventListener("close", function () {
             var dialog = this;
             if (dialog.returnValue != "cancel") {
-                var selectedItem = this.querySelector(".results input[type=radio][name=title]:checked");
+                var selectedItem = dialog.querySelector(".results input[type=radio][name=title]:checked");
                 if (selectedItem) {
                     var title = selectedItem.value;
-                    var wikiUrl = this.wikiUrl;
-                    if (this.returnValue == "replace") {
+                    var wikiUrl = dialog.wikiUrl;
+                    if (dialog.returnValue == "replace") {
                         getMediaWikiText(title, wikiUrl, true, dialog.callback);
                     }
-                    else if (this.returnValue == "append") {
+                    else if (dialog.returnValue == "append") {
                         getMediaWikiText(title, wikiUrl, false, dialog.callback);
                     }
                     else {
@@ -400,7 +404,7 @@ var MediaWikiSearch;
             }
         });
     }
-    MediaWikiSearch.SetupDialog = SetupDialog;
+    MediaWikiSearch.setupDialog = setupDialog;
     function displayDialog(wikiUrl, dialogQuery, callback) {
         var dialog = document.querySelector(dialogQuery);
         dialog.querySelector("input.query").value = "";
@@ -642,6 +646,46 @@ var MediaWikiSearch;
         });
     }
 })(MediaWikiSearch || (MediaWikiSearch = {}));
+var NameSearch;
+(function (NameSearch) {
+    function displayDialog(dialogQuery, text) {
+        var dialog = document.querySelector(dialogQuery);
+        var resultsContainer = dialog.querySelector(".results ul");
+        var resultsForm = dialog.querySelector("form.search-results");
+        dialog.querySelector("header h2").innerHTML = "Detected names";
+        resultsContainer.innerHTML = "";
+        var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+)/g;
+        var possibleNames = [];
+        var groups;
+        var foundNames = [];
+        while ((groups = nameRegex.exec(text)) !== null) {
+            var match = groups[1].trim();
+            if (foundNames.indexOf(match) < 0) {
+                foundNames.push(match);
+                possibleNames.push({
+                    match: groups[1].trim(),
+                    indexStart: groups.index,
+                    indexEnd: nameRegex.lastIndex
+                });
+            }
+        }
+        if (possibleNames.length > 0) {
+            var template_1 = dialog.querySelector(".complex-result-row");
+            possibleNames.forEach(function (possibleName) {
+                var rowElement = document.importNode(template_1.content, true);
+                var textElement = rowElement.querySelector(".description");
+                textElement.innerText = possibleName.match;
+                var inputElements = rowElement.querySelectorAll("input[type=radio]");
+                inputElements.forEach(function (inputElement) {
+                    inputElement.setAttribute("name", possibleName.match);
+                });
+                resultsContainer.appendChild(rowElement);
+            });
+        }
+        dialog.showModal();
+    }
+    NameSearch.displayDialog = displayDialog;
+})(NameSearch || (NameSearch = {}));
 var FormHandling;
 (function (FormHandling) {
     function addValidation(form) {

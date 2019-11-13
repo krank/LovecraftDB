@@ -20,13 +20,15 @@
         <section class="document-links">
             <button title="Get text from Wikisource" type="button" class="wikisource">
                 <img src="media/32px-Wikisource-logo.svg.webp">
+                <span>Get text from Wikisource</span>
             </button>
+            <button title="Find names" type="button" class="find-names"><span>Find names</span></button>
         </section>
 
         <section class="file-management">
-            <button title="Clear all fields" type="button" class="clear fas fa-trash-alt"></button>
-            <button title="Save as XML" type="button" class="export fas fa-file-download"></button>
-            <button title="Load XML" type="button" class="import fas fa-file-upload"></button>
+            <button title="Clear all fields" type="button" class="clear"><span>Clear all fields</span></button>
+            <button title="Save as XML" type="button" class="export"><span>Save as XML</span></button>
+            <button title="Load XML" type="button" class="import"><span>Load XML</span></button>
         </section>
     </section>
 
@@ -145,7 +147,7 @@
         <section>
             <form method="dialog">
                 <header>
-                    <h2>Detected characters</h2>
+                    <h2>Detected names</h2>
 
                     <button type="submit" value="cancel" class="fas fa-times"></button>
 
@@ -155,33 +157,7 @@
             <form method="dialog" class="search-results">
                 <section class="results">
                     <ul>
-                        <li>
-                            <span class="text name">Herbert West, Re-animator</span>
-                            <section class="item-options">
-                                <label>
-                                    <input type="radio" name="herbert" value="character" required>
-                                    <span class="text">Character</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="herbert" value="creature" required>
-                                    <span class="text">Creature</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="herbert" value="location" required>
-                                    <span class="text">Location</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="herbert" value="book" required>
-                                    <span class="text">Book</span>
-                                </label>
-                                <label>
-                                    <input type="radio" name="herbert" value="ignore" required>
-                                    <span class="text">Ignore</span>
-                                </label>
-                            </section>
-                        </li>
                     </ul>
-
                 </section>
 
                 <section class="buttons">
@@ -193,12 +169,33 @@
 
             </form>
 
-            <template class="result-row">
-                <label>
-                    <input type="radio" name="title" value="Dagon" required>
-                    <span class="fas fa-check-circle"></span>
-                    <span class="title">Dagon</span>
-                </label>
+            <template class="complex-result-row">
+                <li>
+                    <section class="text description">Herbert West, Re-animator</section>
+                    <section class="details"></section>
+                    <section class="item-options">
+                        <label>
+                            <input type="radio" name="herbert" value="character" required>
+                            <span class="text">Character</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="herbert" value="creature" required>
+                            <span class="text">Creature</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="herbert" value="location" required>
+                            <span class="text">Location</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="herbert" value="book" required>
+                            <span class="text">Book</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="herbert" value="ignore" required checked>
+                            <span class="text">Ignore</span>
+                        </label>
+                    </section>
+                </li>
             </template>
         </section>
 

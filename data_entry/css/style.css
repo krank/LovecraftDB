@@ -21,6 +21,8 @@ body {
     background-repeat: no-repeat;
 }
 
+/* #region Toolbar */
+
 section.toolbar {
     grid-area: toolbar;
     padding: 1em 2em 0em 2em;
@@ -56,9 +58,46 @@ section.toolbar section {
     display: flex;
 }
 
-section.toolbar section.file-management button {
+section.toolbar button:not(:first-of-type) {
     margin-left: 0.25em;
 }
+
+
+section.toolbar button::before {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 700;
+}
+
+section.toolbar button span {
+    height: 1px;
+ width: 1px;
+ position: absolute;
+ overflow: hidden;
+ top: -10px;
+}
+
+section.toolbar button.clear::before {
+    content: "";
+}
+
+section.toolbar button.export::before {
+    content: "";
+}
+
+section.toolbar button.import::before {
+    content: "";
+}
+
+section.toolbar button.find-names::before {
+    content: "";
+}
+
+
+
+
+
+/* #endregion */
+
 
 main {
     grid-area: text;
@@ -194,11 +233,14 @@ dialog.big form.search-results {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    margin-top: 1em;
 }
 
 dialog.big section.results {
     flex-grow: 1;
     padding-left: 1em;
+    overflow-y: auto;
 }
 
 dialog.big section.results label {
@@ -219,11 +261,16 @@ dialog.big section.results input[type="radio"] {
     display: none;
 }
 
-dialog.big section.results span.text {
+dialog.big section.results .text {
     display: flex;
     line-height: 2em;
     margin-bottom: 0.25em;
     padding-right: 0.6em;
+}
+
+dialog.big section.results ul {
+    list-style-type: none;
+    margin-top: 0;
 }
 
 /* #endregion */
@@ -255,6 +302,7 @@ dialog.big section.results section.item-options {
 
 dialog.big section.results ul li:hover {
     border-bottom: 1px solid black;
+    margin-bottom: -1px;
 }
 
 dialog.big section.results ul {
@@ -262,7 +310,7 @@ dialog.big section.results ul {
     padding-left: 0;
 }
 
-dialog.big section.results ul li > span {
+dialog.big section.results ul li > .text {
     flex-grow:1;
 }
 
