@@ -20,7 +20,7 @@ function SetTextBody(text, replace) {
     else {
         globals.textBodyElement.value += "\n\n" + text;
     }
-    globals.textBodyElement.dispatchEvent(new Event('input', { bubbles: true }));
+    globals.textBodyElement.dispatchEvent(new Event("input", { bubbles: true }));
 }
 function setupGlobalElements() {
     globals = {
@@ -408,7 +408,7 @@ var MediaWikiSearch;
     function displayDialog(wikiUrl, dialogQuery, callback) {
         var dialog = document.querySelector(dialogQuery);
         dialog.querySelector("input.query").value = "";
-        dialog.querySelector("section.results").innerHTML = "";
+        dialog.querySelector("section.results ul").innerHTML = "";
         dialog.querySelectorAll("section.buttons button").forEach(function (button) {
             button.disabled = true;
         });
@@ -432,7 +432,7 @@ var MediaWikiSearch;
     }
     function displaySearchResults(titles, dialog) {
         var template = dialog.resultRowTemplate.content;
-        var container = dialog.querySelector(".results");
+        var container = dialog.querySelector(".results ul");
         var resultsForm = dialog.querySelector("form.search-results");
         container.innerHTML = "";
         if (titles.length == 0) {
@@ -650,45 +650,11 @@ var NameSearch;
 (function (NameSearch) {
     function displayDialog(dialogQuery, text) {
         var dialog = document.querySelector(dialogQuery);
-        var resultsContainer = dialog.querySelector(".results ul");
         var resultsForm = dialog.querySelector("form.search-results");
         dialog.querySelector("header h2").innerHTML = "Detected names";
-        resultsContainer.innerHTML = "";
         var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
-        var possibleNames = [];
-        var groups;
-        var foundNames = [];
-        while ((groups = nameRegex.exec(text)) !== null) {
-            var match = groups[1].trim();
-            if (foundNames.indexOf(match) < 0) {
-                foundNames.push(match);
-                possibleNames.push({
-                    match: groups[1].trim(),
-                    indexStart: groups.index,
-                    indexEnd: nameRegex.lastIndex
-                });
-            }
-        }
-        if (possibleNames.length > 0) {
-            var template_1 = dialog.querySelector(".complex-result-row");
-            possibleNames.forEach(function (possibleName) {
-                var rowElement = document.importNode(template_1.content, true);
-                var textElement = rowElement.querySelector(".description");
-                var detailsElement = rowElement.querySelector(".details");
-                textElement.innerText = possibleName.match;
-                var abstractStart = "…" + text.substring(Math.max(possibleName.indexStart - 24, 0), possibleName.indexStart);
-                var abstractMain = " <strong>" + possibleName.match + "</strong> ";
-                var abstractEnd = text.substring(possibleName.indexEnd, Math.max(possibleName.indexEnd + 24, 0)) + "…";
-                abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                detailsElement.innerHTML = abstractStart + abstractMain + abstractEnd;
-                var inputElements = rowElement.querySelectorAll("input[type=radio]");
-                inputElements.forEach(function (inputElement) {
-                    inputElement.setAttribute("name", possibleName.match);
-                });
-                resultsContainer.appendChild(rowElement);
-            });
-        }
+        var possibleNames = findUniqueMatches(text, nameRegex);
+        displayMatches(possibleNames, text, dialog);
         dialog.addEventListener("close", function () {
             var dialog = this;
             if (dialog.returnValue == "insert") {
@@ -697,6 +663,86 @@ var NameSearch;
         dialog.showModal();
     }
     NameSearch.displayDialog = displayDialog;
+    function displayMatches(matches, text, dialog) {
+        var resultsContainer = dialog.querySelector(".results ul");
+        resultsContainer.innerHTML = "";
+        var itemOptions = [
+            {
+                text: "Character",
+                value: "character"
+            },
+            {
+                text: "Creature",
+                value: "creature"
+            },
+            {
+                text: "Location",
+                value: "location"
+            },
+            {
+                text: "Book",
+                value: "book"
+            },
+            {
+                text: "Ignore",
+                value: "ignore",
+                checked: true
+            }
+        ];
+        if (matches.length > 0) {
+            var template_1 = dialog.querySelector(".complex-result-row");
+            var optionTemplate_1 = dialog.querySelector(".complex-result-row.option");
+            matches.forEach(function (match) {
+                var rowElement = document.importNode(template_1.content, true);
+                var textElement = rowElement.querySelector(".description");
+                var detailsElement = rowElement.querySelector(".details");
+                textElement.innerText = match.matchText;
+                detailsElement.innerHTML = makeAbstract(match, text);
+                makeOptionItems(match.matchText, itemOptions, rowElement, optionTemplate_1);
+                resultsContainer.appendChild(rowElement);
+            });
+        }
+    }
+    function makeOptionItems(name, itemOptions, rowElement, optionTemplate) {
+        var optionsContainer = rowElement.querySelector(".item-options");
+        optionsContainer.innerHTML = "";
+        itemOptions.forEach(function (itemOption) {
+            var optionElement = document.importNode(optionTemplate.content, true);
+            var inputElement = optionElement.querySelector("input");
+            var spanElement = optionElement.querySelector("span");
+            inputElement.value = itemOption.value;
+            inputElement.setAttribute("name", name);
+            inputElement.checked = itemOption.checked;
+            spanElement.textContent = itemOption.text;
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+    function makeAbstract(matchGroup, text) {
+        var abstractStart = "…" + text.substring(Math.max(matchGroup.indexStart - 24, 0), matchGroup.indexStart);
+        var abstractMain = " <strong>" + matchGroup.matchText + "</strong> ";
+        var abstractEnd = text.substring(matchGroup.indexEnd, Math.max(matchGroup.indexEnd + 24, 0)) + "…";
+        abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return abstractStart + abstractMain + abstractEnd;
+    }
+    function findUniqueMatches(text, regExp) {
+        var matches = [];
+        var groups;
+        var foundNames = [];
+        while ((groups = regExp.exec(text)) !== null) {
+            var match = groups[1].trim();
+            if (foundNames.indexOf(match) < 0) {
+                foundNames.push(match);
+                matches.push({
+                    matchText: groups[1].trim(),
+                    indexStart: groups.index,
+                    indexEnd: regExp.lastIndex
+                });
+            }
+        }
+        regExp.lastIndex = 0;
+        return matches;
+    }
     function GetAllOfType(type, form) {
         return [];
     }

@@ -31,6 +31,10 @@ h2 {
     margin-top: 1em;
 }
 
+.hidden {
+    display: none;
+}
+
 .xmlwarning::after {
     content: " Invalid XML warning";
     text-transform: uppercase;

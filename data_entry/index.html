@@ -100,7 +100,6 @@
             <h2>Related links</h2>
             <textarea></textarea>
         </section>
-
     </section>
 
     <dialog class="big search wikisource">
@@ -123,6 +122,9 @@
             <form method="dialog" class="search-results">
 
                 <section class="results">
+                    <ul>
+
+                    </ul>
                 </section>
 
                 <section class="buttons">
@@ -135,10 +137,12 @@
             </form>
 
             <template class="result-row">
-                <label>
-                    <input type="radio" name="title" value="Dagon" required>
-                    <span class="text">Dagon</span>
-                </label>
+                <li>
+                    <label>
+                        <input type="radio" name="title" value="Dagon" required>
+                        <span class="text">Dagon</span>
+                    </label>
+                </li>
             </template>
         </section>
     </dialog>
@@ -154,6 +158,7 @@
                 </header>
             </form>
 
+
             <form method="dialog" class="search-results">
                 <section class="results">
                     <ul>
@@ -166,40 +171,31 @@
                     <button title="Download and replace current text" type="submit" value="cancel"
                         class="fas fa-ban">Cancel</button>
                 </section>
-
             </form>
 
+            <template class="result-row">
+                    <li>
+                        <label>
+                            <input type="radio" name="title" value="Dagon" required>
+                            <span class="text">Dagon</span>
+                        </label>
+                    </li>
+                </template>
             <template class="complex-result-row">
                 <li>
                     <section class="text description" contenteditable="true">Herbert West, Re-animator</section>
                     <section class="details">Testy testing</section>
                     <section class="item-options">
-                        <label>
-                            <input type="radio" name="herbert" value="character" required>
-                            <span class="text">Character</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="herbert" value="creature" required>
-                            <span class="text">Creature</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="herbert" value="location" required>
-                            <span class="text">Location</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="herbert" value="book" required>
-                            <span class="text">Book</span>
-                        </label>
-                        <label>
-                            <input type="radio" name="herbert" value="ignore" required checked>
-                            <span class="text">Ignore</span>
-                        </label>
                     </section>
                 </li>
             </template>
+            <template class="complex-result-row option">
+                <label>
+                    <input type="radio" name="herbert" value="character" required>
+                    <span class="text">Character</span>
+                </label>
+            </template>
         </section>
-
-
     </dialog>
 
     <dialog class="decision">

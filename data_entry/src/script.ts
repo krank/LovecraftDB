@@ -54,8 +54,7 @@ function SetTextBody(text: string, replace: boolean = true) {
         globals.textBodyElement.value += "\n\n" + text;
     }
 
-    globals.textBodyElement.dispatchEvent(new Event('input', { bubbles: true }))
-
+    globals.textBodyElement.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
 function setupGlobalElements() {
@@ -387,7 +386,6 @@ namespace XMlHandling {
     }
 
     export function LoadXml(xmlText: string): void {
-
         let XmlDocument = domParser.parseFromString(xmlText, "text/xml");
 
         dataPairs.forEach(pair => {
@@ -426,24 +424,24 @@ namespace XMlHandling {
     }
 
     export function Clear(): void {
+        DecisionDialog.displayDialog(
+            "Cear all fields",
+            "Are you sure? This will clear all fields and give you a clean slate.",
+            "yes",
+            (decision: string) => {
+                if (decision == "yes") {
+                    dataPairs.forEach(dataPair => {
+                        let elements: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = document.querySelectorAll<
+                            HTMLInputElement | HTMLTextAreaElement
+                        >(dataPair.documentElementSelector);
 
-        DecisionDialog.displayDialog("Cear all fields", "Are you sure? This will clear all fields and give you a clean slate.", "yes", (decision:string) => {
-
-            if (decision == "yes") {
-                dataPairs.forEach(dataPair => {
-
-                    let elements: NodeListOf<HTMLInputElement|HTMLTextAreaElement> = document.querySelectorAll<HTMLInputElement|HTMLTextAreaElement>(dataPair.documentElementSelector);
-        
-                    elements.forEach(element => {
-                        element.value = "";
+                        elements.forEach(element => {
+                            element.value = "";
+                        });
                     });
-        
-                })
+                }
             }
-
-        })
-
-        
+        );
     }
 }
 
@@ -481,7 +479,7 @@ namespace FileManagement {
                 const fileReader: FileReader = event.target as FileReader;
 
                 if ((fileReader.result as string).length == 0) {
-                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.")
+                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
                 }
 
                 callback(fileReader.result as string);
@@ -588,7 +586,9 @@ namespace MediaWikiSearch {
             let dialog = this as WikiDialog;
 
             if (dialog.returnValue != "cancel") {
-                let selectedItem:HTMLInputElement = dialog.querySelector(".results input[type=radio][name=title]:checked");
+                let selectedItem: HTMLInputElement = dialog.querySelector(
+                    ".results input[type=radio][name=title]:checked"
+                );
                 if (selectedItem) {
                     let title: string = selectedItem.value;
 
@@ -617,7 +617,7 @@ namespace MediaWikiSearch {
         (dialog.querySelector("input.query") as HTMLInputElement).value = "";
 
         // Clear search results
-        (dialog.querySelector("section.results") as HTMLElement).innerHTML = "";
+        (dialog.querySelector("section.results ul") as HTMLElement).innerHTML = "";
 
         // Restore buttons to disabled
         (dialog.querySelectorAll("section.buttons button") as NodeListOf<HTMLButtonElement>).forEach(button => {
@@ -652,7 +652,7 @@ namespace MediaWikiSearch {
         // Callback for mediawiki search result titles
 
         const template = dialog.resultRowTemplate.content;
-        const container = dialog.querySelector(".results");
+        const container = dialog.querySelector(".results ul");
 
         const resultsForm: HTMLFormElement = dialog.querySelector("form.search-results") as HTMLFormElement;
 
@@ -900,7 +900,6 @@ namespace MediaWikiSearch {
 }
 
 namespace NameSearch {
-
     /* 
         Needed from outside/config:
         - Init: declarations, adding validations, preparations, search box etc.
@@ -918,10 +917,6 @@ namespace NameSearch {
         - Buttons (actions when closing dialog)
     */
 
-    interface DialogOptions {
-        dialogQuery
-    }
-
     interface ComplexDialog extends HTMLDialogElement {
         wikiUrl?: string;
         resultRowTemplate: HTMLTemplateElement;
@@ -929,109 +924,158 @@ namespace NameSearch {
         callback?: (text: string, replace: boolean) => void;
     }
 
-    interface Group {
-        match: string,
-        indexStart: number,
-        indexEnd: number
+    interface RegexGroup {
+        matchText: string;
+        indexStart: number;
+        indexEnd: number;
     }
 
-    
+    interface ItemOption {
+        value: string;
+        text: string;
+        checked?: boolean;
+    }
 
     export function displayDialog(dialogQuery: string, text: string) {
-
         const dialog: ComplexDialog = document.querySelector(dialogQuery);
-        const resultsContainer:HTMLElement = dialog.querySelector(".results ul");
+
         const resultsForm: HTMLFormElement = dialog.querySelector("form.search-results") as HTMLFormElement;
 
-        dialog.querySelector("header h2").innerHTML = "Detected names"
-
-        resultsContainer.innerHTML = "";
-
+        dialog.querySelector("header h2").innerHTML = "Detected names";
 
         // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
         // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
         let nameRegex: RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
 
-        let possibleNames:Group[] = [];
+        let possibleNames = findUniqueMatches(text, nameRegex);
 
-        let groups:RegExpExecArray;
-
-        let foundNames:string[] = [];
-        while ((groups = nameRegex.exec(text)) !== null) {
-            let match:string = groups[1].trim();
-
-            if (foundNames.indexOf(match) < 0) {
-                foundNames.push(match);
-                possibleNames.push({
-                    match: groups[1].trim(),
-                    indexStart: groups.index,
-                    indexEnd: nameRegex.lastIndex
-                })
-            }
-        }
-
-        if (possibleNames.length > 0) {
-            const template:HTMLTemplateElement = dialog.querySelector(".complex-result-row");
-
-            possibleNames.forEach(possibleName => {
-                const rowElement: DocumentFragment = document.importNode(template.content, true);
-
-                const textElement:HTMLElement = rowElement.querySelector(".description");
-                const detailsElement:HTMLElement = rowElement.querySelector(".details");
-
-                textElement.innerText = possibleName.match;
-
-                let abstractStart: string = "…" + text.substring(
-                    Math.max(possibleName.indexStart - 24, 0),
-                    possibleName.indexStart
-                );
-
-                let abstractMain = ` <strong>${possibleName.match}</strong> `;
-
-                let abstractEnd: string = text.substring(
-                    possibleName.indexEnd, 
-                    Math.max(possibleName.indexEnd + 24, 0)
-                ) + "…";
-
-                abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-                detailsElement.innerHTML = abstractStart + abstractMain + abstractEnd;
-
-                const inputElements: NodeListOf<HTMLInputElement> = rowElement.querySelectorAll("input[type=radio]");
-
-                inputElements.forEach(inputElement => {
-                    inputElement.setAttribute("name", possibleName.match);
-                })
-
-                resultsContainer.appendChild(rowElement);
-
-            });
-
-        }
+        displayMatches(possibleNames, text, dialog);
 
         dialog.addEventListener("close", function() {
             let dialog = this as HTMLDialogElement;
 
             if (dialog.returnValue == "insert") {
-
                 // TODO: Gather all names that have been categorized
-
+                
             }
-
         });
-        
 
         dialog.showModal();
-
     }
 
-    function GetAllOfType(type:string, form:HTMLFormElement): string[] {
+    function displayMatches(matches: RegexGroup[], text: string, dialog: HTMLDialogElement) {
+        const resultsContainer: HTMLElement = dialog.querySelector(".results ul");
 
+        resultsContainer.innerHTML = "";
 
+        const itemOptions: ItemOption[] = [
+            {
+                text: "Character",
+                value: "character"
+            },
+            {
+                text: "Creature",
+                value: "creature"
+            },
+            {
+                text: "Location",
+                value: "location"
+            },
+            {
+                text: "Book",
+                value: "book"
+            },
+            {
+                text: "Ignore",
+                value: "ignore",
+                checked: true
+            }
+        ];
+
+        if (matches.length > 0) {
+            const template: HTMLTemplateElement = dialog.querySelector(".complex-result-row");
+            const optionTemplate: HTMLTemplateElement = dialog.querySelector(".complex-result-row.option");
+
+            matches.forEach(match => {
+                const rowElement: DocumentFragment = document.importNode(template.content, true);
+
+                const textElement: HTMLElement = rowElement.querySelector(".description");
+                const detailsElement: HTMLElement = rowElement.querySelector(".details");
+
+                textElement.innerText = match.matchText;
+                detailsElement.innerHTML = makeAbstract(match, text);
+
+                makeOptionItems(match.matchText, itemOptions, rowElement, optionTemplate);
+
+                resultsContainer.appendChild(rowElement);
+            });
+        }
+    }
+
+    function makeOptionItems(
+        name: string,
+        itemOptions: ItemOption[],
+        rowElement: DocumentFragment,
+        optionTemplate: HTMLTemplateElement
+    ) {
+        const optionsContainer: HTMLElement = rowElement.querySelector(".item-options");
+
+        optionsContainer.innerHTML = "";
+
+        itemOptions.forEach(itemOption => {
+            const optionElement = document.importNode(optionTemplate.content, true);
+            const inputElement = optionElement.querySelector("input");
+            const spanElement = optionElement.querySelector("span");
+
+            inputElement.value = itemOption.value;
+            inputElement.setAttribute("name", name);
+            inputElement.checked = itemOption.checked;
+            spanElement.textContent = itemOption.text;
+
+            optionsContainer.appendChild(optionElement);
+        });
+    }
+
+    function makeAbstract(matchGroup: RegexGroup, text: string): string {
+        let abstractStart: string =
+            "…" + text.substring(Math.max(matchGroup.indexStart - 24, 0), matchGroup.indexStart);
+
+        let abstractMain = ` <strong>${matchGroup.matchText}</strong> `;
+
+        let abstractEnd: string = text.substring(matchGroup.indexEnd, Math.max(matchGroup.indexEnd + 24, 0)) + "…";
+
+        abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        return abstractStart + abstractMain + abstractEnd;
+    }
+
+    function findUniqueMatches(text: string, regExp: RegExp): RegexGroup[] {
+        let matches: RegexGroup[] = [];
+        let groups: RegExpExecArray;
+
+        let foundNames: string[] = [];
+        while ((groups = regExp.exec(text)) !== null) {
+            let match: string = groups[1].trim();
+
+            if (foundNames.indexOf(match) < 0) {
+                foundNames.push(match);
+                matches.push({
+                    matchText: groups[1].trim(),
+                    indexStart: groups.index,
+                    indexEnd: regExp.lastIndex
+                });
+            }
+        }
+
+        regExp.lastIndex = 0;
+
+        return matches;
+    }
+
+    function GetAllOfType(type: string, form: HTMLFormElement): string[] {
         return [];
     }
-
 }
 
 namespace FormHandling {
