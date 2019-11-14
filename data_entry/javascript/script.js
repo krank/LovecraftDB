@@ -654,7 +654,7 @@ var NameSearch;
         var resultsForm = dialog.querySelector("form.search-results");
         dialog.querySelector("header h2").innerHTML = "Detected names";
         resultsContainer.innerHTML = "";
-        var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+)/g;
+        var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
         var possibleNames = [];
         var groups;
         var foundNames = [];
@@ -674,7 +674,14 @@ var NameSearch;
             possibleNames.forEach(function (possibleName) {
                 var rowElement = document.importNode(template_1.content, true);
                 var textElement = rowElement.querySelector(".description");
+                var detailsElement = rowElement.querySelector(".details");
                 textElement.innerText = possibleName.match;
+                var abstractStart = "…" + text.substring(Math.max(possibleName.indexStart - 24, 0), possibleName.indexStart);
+                var abstractMain = " <strong>" + possibleName.match + "</strong> ";
+                var abstractEnd = text.substring(possibleName.indexEnd, Math.max(possibleName.indexEnd + 24, 0)) + "…";
+                abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                detailsElement.innerHTML = abstractStart + abstractMain + abstractEnd;
                 var inputElements = rowElement.querySelectorAll("input[type=radio]");
                 inputElements.forEach(function (inputElement) {
                     inputElement.setAttribute("name", possibleName.match);
@@ -682,9 +689,17 @@ var NameSearch;
                 resultsContainer.appendChild(rowElement);
             });
         }
+        dialog.addEventListener("close", function () {
+            var dialog = this;
+            if (dialog.returnValue == "insert") {
+            }
+        });
         dialog.showModal();
     }
     NameSearch.displayDialog = displayDialog;
+    function GetAllOfType(type, form) {
+        return [];
+    }
 })(NameSearch || (NameSearch = {}));
 var FormHandling;
 (function (FormHandling) {

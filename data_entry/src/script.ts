@@ -935,6 +935,8 @@ namespace NameSearch {
         indexEnd: number
     }
 
+    
+
     export function displayDialog(dialogQuery: string, text: string) {
 
         const dialog: ComplexDialog = document.querySelector(dialogQuery);
@@ -948,7 +950,7 @@ namespace NameSearch {
 
         // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
         // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
-        let nameRegex: RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+)/g;
+        let nameRegex: RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
 
         let possibleNames:Group[] = [];
 
@@ -975,9 +977,26 @@ namespace NameSearch {
                 const rowElement: DocumentFragment = document.importNode(template.content, true);
 
                 const textElement:HTMLElement = rowElement.querySelector(".description");
+                const detailsElement:HTMLElement = rowElement.querySelector(".details");
 
                 textElement.innerText = possibleName.match;
 
+                let abstractStart: string = "…" + text.substring(
+                    Math.max(possibleName.indexStart - 24, 0),
+                    possibleName.indexStart
+                );
+
+                let abstractMain = ` <strong>${possibleName.match}</strong> `;
+
+                let abstractEnd: string = text.substring(
+                    possibleName.indexEnd, 
+                    Math.max(possibleName.indexEnd + 24, 0)
+                ) + "…";
+
+                abstractStart = abstractStart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                abstractEnd = abstractEnd.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                detailsElement.innerHTML = abstractStart + abstractMain + abstractEnd;
 
                 const inputElements: NodeListOf<HTMLInputElement> = rowElement.querySelectorAll("input[type=radio]");
 
@@ -985,18 +1004,32 @@ namespace NameSearch {
                     inputElement.setAttribute("name", possibleName.match);
                 })
 
-
                 resultsContainer.appendChild(rowElement);
 
             });
 
         }
 
-        
+        dialog.addEventListener("close", function() {
+            let dialog = this as HTMLDialogElement;
 
+            if (dialog.returnValue == "insert") {
+
+                // TODO: Gather all names that have been categorized
+
+            }
+
+        });
+        
 
         dialog.showModal();
 
+    }
+
+    function GetAllOfType(type:string, form:HTMLFormElement): string[] {
+
+
+        return [];
     }
 
 }
