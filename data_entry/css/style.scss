@@ -215,6 +215,10 @@ dialog.big {
         }
     }
 
+    form.search-box.hidden {
+        display: none;
+    }
+
     form.search-results {
         flex-grow: 1;
         display: flex;

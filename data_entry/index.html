@@ -102,78 +102,40 @@
         </section>
     </section>
 
-    <dialog class="big search wikisource">
-        <section>
-            <form method="dialog">
-                <header>
-                    <h2>Download from Wikisource</h2>
+    <template class="big dialog">
+        <dialog class="big complex">
+            <section>
+                <form method="dialog">
+                    <header>
+                        <h2>Detected names</h2>
 
-                    <button type="submit" value="cancel" class="fas fa-times"></button>
+                        <button type="submit" value="cancel" class="fas fa-times"></button>
 
-                </header>
-            </form>
+                    </header>
+                </form>
 
-            <form action="#" class="search-box">
-                <input class="query" type="text" placeholder="Type your query here…" name="search" minlength="2"
-                    required>
-                <button type="submit" class="fas fa-search" disabled></button>
-            </form>
+                <form action="#" class="search-box">
+                    <input class="query" type="text" placeholder="Type your query here…" name="search" minlength="2"
+                        required>
+                    <button type="submit" class="fas fa-search" disabled></button>
+                </form>
 
-            <form method="dialog" class="search-results">
+                <form method="dialog" class="search-results">
+                    <section class="results">
+                        <ul>
+                        </ul>
+                    </section>
 
-                <section class="results">
-                    <ul>
+                    <section class="buttons">
+                        <button title="Download and append to text" type="submit" value="insert"
+                            class="fas fa-plus">Insert
+                            into lists</button>
+                        <button title="Download and replace current text" type="submit" value="cancel"
+                            class="fas fa-ban">Cancel</button>
+                    </section>
+                </form>
 
-                    </ul>
-                </section>
-
-                <section class="buttons">
-                    <button title="Download and append to text" type="submit" value="append"
-                        class="fas fa-plus">Append</button>
-                    <button title="Download and replace current text" type="submit" value="replace"
-                        class="fas fa-arrow-alt-circle-down">Replace</button>
-                </section>
-
-            </form>
-
-            <template class="result-row">
-                <li>
-                    <label>
-                        <input type="radio" name="title" value="Dagon" required>
-                        <span class="text">Dagon</span>
-                    </label>
-                </li>
-            </template>
-        </section>
-    </dialog>
-
-    <dialog class="big complex">
-        <section>
-            <form method="dialog">
-                <header>
-                    <h2>Detected names</h2>
-
-                    <button type="submit" value="cancel" class="fas fa-times"></button>
-
-                </header>
-            </form>
-
-
-            <form method="dialog" class="search-results">
-                <section class="results">
-                    <ul>
-                    </ul>
-                </section>
-
-                <section class="buttons">
-                    <button title="Download and append to text" type="submit" value="insert" class="fas fa-plus">Insert
-                        into lists</button>
-                    <button title="Download and replace current text" type="submit" value="cancel"
-                        class="fas fa-ban">Cancel</button>
-                </section>
-            </form>
-
-            <template class="result-row">
+                <template class="result-row">
                     <li>
                         <label>
                             <input type="radio" name="title" value="Dagon" required>
@@ -181,22 +143,23 @@
                         </label>
                     </li>
                 </template>
-            <template class="complex-result-row">
-                <li>
-                    <section class="text description" contenteditable="true">Herbert West, Re-animator</section>
-                    <section class="details">Testy testing</section>
-                    <section class="item-options">
-                    </section>
-                </li>
-            </template>
-            <template class="complex-result-row option">
-                <label>
-                    <input type="radio" name="herbert" value="character" required>
-                    <span class="text">Character</span>
-                </label>
-            </template>
-        </section>
-    </dialog>
+                <template class="complex-result-row">
+                    <li>
+                        <section class="text description" contenteditable="true">Herbert West, Re-animator</section>
+                        <section class="details">Testy testing</section>
+                        <section class="item-options">
+                        </section>
+                    </li>
+                </template>
+                <template class="complex-result-row option">
+                    <label>
+                        <input type="radio" name="herbert" value="character" required>
+                        <span class="text">Character</span>
+                    </label>
+                </template>
+            </section>
+        </dialog>
+    </template>
 
     <dialog class="decision">
         <section>

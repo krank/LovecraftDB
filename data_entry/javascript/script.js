@@ -1,7 +1,6 @@
 var globals;
 window.addEventListener("load", function () {
     setupGlobalElements();
-    MediaWikiSearch.setupDialog("dialog.wikisource", "template.result-row");
     XMlHandling.setupXMLValidation();
     setupToolbar();
 });
@@ -32,11 +31,11 @@ function setupGlobalElements() {
 function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", function (event) {
         event.preventDefault();
-        MediaWikiSearch.displayDialog("https://en.wikisource.org", "dialog.wikisource", SetTextBody);
+        MediaWikiSearch.displayDialog("https://en.wikisource.org", SetTextBody);
     });
     document.querySelector("section.toolbar button.find-names").addEventListener("click", function (event) {
         event.preventDefault();
-        NameSearch.displayDialog("dialog.complex", globals.textBodyElement.value);
+        NameSearch.displayDialog(globals.textBodyElement.value);
     });
     document.querySelector("section.toolbar button.export").addEventListener("click", function (event) {
         event.preventDefault();
@@ -370,13 +369,26 @@ var DecisionDialog;
 })(DecisionDialog || (DecisionDialog = {}));
 var MediaWikiSearch;
 (function (MediaWikiSearch) {
-    function setupDialog(dialogQuery, resultRowTemplateQuery) {
-        var dialog = document.querySelector(dialogQuery);
-        dialog.resultRowTemplate = dialog.querySelector(resultRowTemplateQuery);
+    function displayDialog(wikiUrl, callback) {
+        var dialogTemplate = document.querySelector(".big.dialog");
+        var dialogFragment = document.importNode(dialogTemplate, true).content;
+        var dialog = dialogFragment.querySelector("dialog");
+        document.querySelector("body").appendChild(dialog);
+        var searchForm = dialog.querySelector("form.search-box");
+        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
+        dialog.querySelector("form.search-box").classList.remove("hidden");
+        dialog.querySelector("input.query").value = "";
+        dialog.querySelector("section.results ul").innerHTML = "";
+        dialog.querySelectorAll("section.buttons button").forEach(function (button) {
+            button.disabled = true;
+        });
         FormHandling.addValidation(dialog.querySelector("form.search-box"));
         FormHandling.addValidation(dialog.querySelector("form.search-results"));
-        var searchForm = dialog.querySelector("form.search-box");
         searchForm.wikiDialog = dialog;
+        dialog.wikiUrl = wikiUrl;
+        dialog.callback = callback;
+        dialog.resultRowTemplate = dialog.querySelector(".result-row");
+        console.log(dialog.resultRowTemplate);
         searchForm.addEventListener("submit", function (event) {
             event.preventDefault();
             var dialog = this.wikiDialog;
@@ -385,35 +397,26 @@ var MediaWikiSearch;
             searchMediaWiki(query, dialog);
         });
         dialog.addEventListener("close", function () {
+            alert("Going once");
             var dialog = this;
             if (dialog.returnValue != "cancel") {
                 var selectedItem = dialog.querySelector(".results input[type=radio][name=title]:checked");
                 if (selectedItem) {
                     var title = selectedItem.value;
-                    var wikiUrl = dialog.wikiUrl;
+                    var wikiUrl_1 = dialog.wikiUrl;
                     if (dialog.returnValue == "replace") {
-                        getMediaWikiText(title, wikiUrl, true, dialog.callback);
+                        getMediaWikiText(title, wikiUrl_1, true, dialog.callback);
                     }
                     else if (dialog.returnValue == "append") {
-                        getMediaWikiText(title, wikiUrl, false, dialog.callback);
+                        getMediaWikiText(title, wikiUrl_1, false, dialog.callback);
                     }
                     else {
                         alert("Whatcho talkin bout Willis?");
                     }
                 }
             }
+            dialog.remove();
         });
-    }
-    MediaWikiSearch.setupDialog = setupDialog;
-    function displayDialog(wikiUrl, dialogQuery, callback) {
-        var dialog = document.querySelector(dialogQuery);
-        dialog.querySelector("input.query").value = "";
-        dialog.querySelector("section.results ul").innerHTML = "";
-        dialog.querySelectorAll("section.buttons button").forEach(function (button) {
-            button.disabled = true;
-        });
-        dialog.wikiUrl = wikiUrl;
-        dialog.callback = callback;
         dialog.showModal();
     }
     MediaWikiSearch.displayDialog = displayDialog;
@@ -648,10 +651,37 @@ var MediaWikiSearch;
 })(MediaWikiSearch || (MediaWikiSearch = {}));
 var NameSearch;
 (function (NameSearch) {
-    function displayDialog(dialogQuery, text) {
-        var dialog = document.querySelector(dialogQuery);
-        var resultsForm = dialog.querySelector("form.search-results");
+    var itemOptions = [
+        {
+            text: "Character",
+            value: "character"
+        },
+        {
+            text: "Creature",
+            value: "creature"
+        },
+        {
+            text: "Location",
+            value: "location"
+        },
+        {
+            text: "Book",
+            value: "book"
+        },
+        {
+            text: "Ignore",
+            value: "ignore",
+            checked: true
+        }
+    ];
+    function displayDialog(text) {
+        var dialogTemplate = document.querySelector(".big.dialog");
+        var dialogFragment = document.importNode(dialogTemplate, true).content;
+        var dialog = dialogFragment.querySelector("dialog");
+        document.querySelector("body").appendChild(dialog);
         dialog.querySelector("header h2").innerHTML = "Detected names";
+        dialog.querySelector("form.search-box").classList.add("hidden");
+        FormHandling.addValidation(dialog.querySelector("form.search-results"));
         var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
         var possibleNames = findUniqueMatches(text, nameRegex);
         displayMatches(possibleNames, text, dialog);
@@ -659,6 +689,7 @@ var NameSearch;
             var dialog = this;
             if (dialog.returnValue == "insert") {
             }
+            dialog.remove();
         });
         dialog.showModal();
     }
@@ -666,29 +697,6 @@ var NameSearch;
     function displayMatches(matches, text, dialog) {
         var resultsContainer = dialog.querySelector(".results ul");
         resultsContainer.innerHTML = "";
-        var itemOptions = [
-            {
-                text: "Character",
-                value: "character"
-            },
-            {
-                text: "Creature",
-                value: "creature"
-            },
-            {
-                text: "Location",
-                value: "location"
-            },
-            {
-                text: "Book",
-                value: "book"
-            },
-            {
-                text: "Ignore",
-                value: "ignore",
-                checked: true
-            }
-        ];
         if (matches.length > 0) {
             var template_1 = dialog.querySelector(".complex-result-row");
             var optionTemplate_1 = dialog.querySelector(".complex-result-row.option");
