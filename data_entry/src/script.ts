@@ -29,13 +29,9 @@ interface Globals {
 
 window.addEventListener("load", function() {
     setupGlobalElements();
-
-    //MediaWikiSearch.setupDialog("dialog.wikisource", "template.result-row");
-    XMlHandling.setupXMLValidation();
-
-    //NameSearch.setupDialog("dialog.complex", "template.result-row");
-
     setupToolbar();
+    
+    XMlHandling.setupXMLValidation();
 });
 
 function SetTextBody(text: string, replace: boolean = true) {
@@ -526,6 +522,68 @@ namespace DecisionDialog {
     }
 }
 
+namespace BigDialog {
+    interface ButtonElementInfo {
+        text: string,
+        value: string,
+        title: string,
+        classes: string[]
+    }
+
+    export function setupDialog(title: string, useSearchForm: boolean, submitButtons: ButtonElementInfo[] ): HTMLDialogElement {
+        // Dialog element creation
+        const dialogTemplate: HTMLTemplateElement = document.querySelector(".big.dialog");
+        const dialogFragment: DocumentFragment = document.importNode(dialogTemplate, true).content;
+        const dialog: HTMLDialogElement = dialogFragment.querySelector("dialog") as HTMLDialogElement;
+        document.querySelector("body").appendChild(dialog);
+
+        // Config dialog
+        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
+        dialog.querySelector("form.search-box").classList.toggle("hidden", !useSearchForm);
+
+        // Reset dialog
+        (dialog.querySelector("input.query") as HTMLInputElement).value = "";
+        (dialog.querySelector("section.results ul") as HTMLElement).innerHTML = "";
+        (dialog.querySelector("section.buttons") as HTMLElement).innerHTML = "";
+
+        (dialog.querySelectorAll("section.buttons button") as NodeListOf<HTMLButtonElement>).forEach(button => {
+            button.disabled = true;
+        });
+
+        // Submit buttons
+        setupSubmitButtons(dialog, submitButtons);
+
+        // Validation for search box & results
+        FormHandling.addValidation(dialog.querySelector("form.search-box"));
+        FormHandling.addValidation(dialog.querySelector("form.search-results"));
+
+        return dialog;
+    }
+
+    function setupSubmitButtons(dialog: HTMLDialogElement, submitButtons: ButtonElementInfo[]) {
+        const submitButtonTemplate:HTMLTemplateElement = dialog.querySelector("template.submit-button");
+        const submitButtonContainer:HTMLElement = dialog.querySelector(".buttons");
+
+        submitButtons.forEach(buttonInfo => {
+            const submitButtonFragment:DocumentFragment = document.importNode(submitButtonTemplate.content, true);
+            const submitButtonElement:HTMLButtonElement = submitButtonFragment.querySelector("button");
+
+            submitButtonElement.value = buttonInfo.value;
+            submitButtonElement.title = buttonInfo.title;
+            submitButtonElement.textContent = buttonInfo.text;
+
+            buttonInfo.classes.forEach(buttonClass => {
+                submitButtonElement.classList.add(buttonClass);
+            })
+
+            submitButtonElement.disabled = true;
+
+            submitButtonContainer.appendChild(submitButtonFragment);
+        });
+    }
+}
+
+
 namespace MediaWikiSearch {
     interface RegexpReplacement {
         description: string;
@@ -555,91 +613,37 @@ namespace MediaWikiSearch {
         wikiDialog?: WikiDialog;
     }
 
-    /*export function setupDialog(dialogQuery: string, resultRowTemplateQuery: string) {
-        let dialog: WikiDialog = document.querySelector(dialogQuery);
+    interface RegexGroup {
+        matchText: string;
+        indexStart: number;
+        indexEnd: number;
+    }
 
-        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
+    interface ItemOption {
+        value: string;
+        text: string;
+        checked?: boolean;
+    }
 
-        dialog.querySelector("form.search-box").classList.remove("hidden");
+    export function displayDialog(wikiUrl: string, callback: (text: string, replace: boolean) => void) {
 
-        dialog.resultRowTemplate = dialog.querySelector(resultRowTemplateQuery) as HTMLTemplateElement;
-
-        // Validation for search box & results
-        FormHandling.addValidation(dialog.querySelector("form.search-box"));
-        FormHandling.addValidation(dialog.querySelector("form.search-results"));
-
-        // Form search submit action
-        let searchForm: WikiForm = dialog.querySelector("form.search-box");
-
-        searchForm.wikiDialog = dialog;
-
-        // Setup search action
-        searchForm.addEventListener("submit", function(event: Event) {
-            event.preventDefault();
-
-            let dialog: WikiDialog = (this as WikiForm).wikiDialog;
-
-            let query: string = (this.querySelector("input.query") as HTMLInputElement).value;
-
-            dialog.query = query;
-
-            searchMediaWiki(query, dialog);
-        });
-
-        // Setup dialog closing action
-        dialog.addEventListener("close", function() {
-            let dialog = this as WikiDialog;
-
-            if (dialog.returnValue != "cancel") {
-                let selectedItem: HTMLInputElement = dialog.querySelector(
-                    ".results input[type=radio][name=title]:checked"
-                );
-                if (selectedItem) {
-                    let title: string = selectedItem.value;
-
-                    let wikiUrl = dialog.wikiUrl;
-
-                    if (dialog.returnValue == "replace") {
-                        getMediaWikiText(title, wikiUrl, true, dialog.callback);
-                    } else if (dialog.returnValue == "append") {
-                        getMediaWikiText(title, wikiUrl, false, dialog.callback);
-                    } else {
-                        alert("Whatcho talkin bout Willis?");
-                    }
-                }
+        const dialog: WikiDialog = BigDialog.setupDialog("Download from Wikisource", true,[
+            {
+                title: "Download and append to text",
+                text: "Append",
+                value: "append",
+                classes: ["fas", "fa-file-medical"]
+            },
+            {
+                title: "Download and replace current text",
+                text: "Download",
+                value: "replace",
+                classes: ["fas","fa-file-alt"]
             }
-        });
-    }*/
-
-    export function displayDialog(
-        wikiUrl: string,
-        callback: (text: string, replace: boolean) => void
-    ) {
-        // Dialog element creation
-        const dialogTemplate: HTMLTemplateElement = document.querySelector(".big.dialog");
-        const dialogFragment: DocumentFragment = document.importNode(dialogTemplate, true).content;
-        const dialog: WikiDialog = dialogFragment.querySelector("dialog") as WikiDialog;
-        document.querySelector("body").appendChild(dialog);
+        ]) as WikiDialog;
 
         // Get references
-        //let dialog: WikiDialog = document.querySelector(dialogQuery);
         const searchForm: WikiForm = dialog.querySelector("form.search-box");
-
-        // Config dialog
-        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
-        dialog.querySelector("form.search-box").classList.remove("hidden");
-
-        // Reset dialog
-        (dialog.querySelector("input.query") as HTMLInputElement).value = "";
-        (dialog.querySelector("section.results ul") as HTMLElement).innerHTML = "";
-
-        (dialog.querySelectorAll("section.buttons button") as NodeListOf<HTMLButtonElement>).forEach(button => {
-            button.disabled = true;
-        });
-
-        // Validation for search box & results
-        FormHandling.addValidation(dialog.querySelector("form.search-box"));
-        FormHandling.addValidation(dialog.querySelector("form.search-results"));
 
         // Save references for later
         searchForm.wikiDialog = dialog;
@@ -647,8 +651,6 @@ namespace MediaWikiSearch {
         dialog.callback = callback;
         dialog.resultRowTemplate = dialog.querySelector(".result-row") as HTMLTemplateElement;
 
-        console.log(dialog.resultRowTemplate);
-
         // Setup search action
         searchForm.addEventListener("submit", function(event: Event) {
             event.preventDefault();
@@ -664,7 +666,6 @@ namespace MediaWikiSearch {
 
         // Setup dialog closing action
         dialog.addEventListener("close", function() {
-            alert("Going once");
             let dialog = this as WikiDialog;
 
             if (dialog.returnValue != "cancel") {
@@ -961,29 +962,6 @@ namespace MediaWikiSearch {
 }
 
 namespace NameSearch {
-    /* 
-        Needed from outside/config:
-        - Init: declarations, adding validations, preparations, search box etc.
-        - Submit button handlers: Button names + click functions
-
-        Similarities between dialogs:
-        - Validation of forms
-        - Same HTML
-        - Have results
-
-        Differences between dialogs:
-        - Startup action
-        - Events
-        - Results
-        - Buttons (actions when closing dialog)
-    */
-
-    interface ComplexDialog extends HTMLDialogElement {
-        wikiUrl?: string;
-        resultRowTemplate: HTMLTemplateElement;
-        query?: string;
-        callback?: (text: string, replace: boolean) => void;
-    }
 
     interface RegexGroup {
         matchText: string;
@@ -1022,17 +1000,21 @@ namespace NameSearch {
     ];
 
     export function displayDialog(text: string) {
-        // Dialog element creation
-        const dialogTemplate: HTMLTemplateElement = document.querySelector(".big.dialog");
-        const dialogFragment: DocumentFragment = document.importNode(dialogTemplate, true).content;
-        const dialog: ComplexDialog = dialogFragment.querySelector("dialog") as ComplexDialog;
-        document.querySelector("body").appendChild(dialog);
 
-        dialog.querySelector("header h2").innerHTML = "Detected names";
-
-        dialog.querySelector("form.search-box").classList.add("hidden");
-
-        FormHandling.addValidation(dialog.querySelector("form.search-results"));
+        const dialog:HTMLDialogElement = BigDialog.setupDialog("Detected names", false, [
+            {
+                title: "Append names to lists",
+                text: "Append",
+                value: "append",
+                classes: ["fas", "fa-list"]
+            },
+            {
+                title: "Cancel",
+                text: "Cancel",
+                value: "cancel",
+                classes: ["fas","fa-ban"]
+            }
+        ])
 
         // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
         // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
@@ -1042,10 +1024,11 @@ namespace NameSearch {
 
         displayMatches(possibleNames, text, dialog);
 
+        // Setup dialog closing action
         dialog.addEventListener("close", function() {
             let dialog = this as HTMLDialogElement;
 
-            if (dialog.returnValue == "insert") {
+            if (dialog.returnValue == "append") {
                 // TODO: Gather all names that have been categorized
             }
             dialog.remove();
@@ -1138,10 +1121,6 @@ namespace NameSearch {
         regExp.lastIndex = 0;
 
         return matches;
-    }
-
-    function GetAllOfType(type: string, form: HTMLFormElement): string[] {
-        return [];
     }
 }
 

@@ -1,8 +1,8 @@
 var globals;
 window.addEventListener("load", function () {
     setupGlobalElements();
-    XMlHandling.setupXMLValidation();
     setupToolbar();
+    XMlHandling.setupXMLValidation();
 });
 function SetTextBody(text, replace) {
     if (replace === void 0) { replace = true; }
@@ -367,28 +367,66 @@ var DecisionDialog;
     }
     DecisionDialog.displayDialog = displayDialog;
 })(DecisionDialog || (DecisionDialog = {}));
-var MediaWikiSearch;
-(function (MediaWikiSearch) {
-    function displayDialog(wikiUrl, callback) {
+var BigDialog;
+(function (BigDialog) {
+    function setupDialog(title, useSearchForm, submitButtons) {
         var dialogTemplate = document.querySelector(".big.dialog");
         var dialogFragment = document.importNode(dialogTemplate, true).content;
         var dialog = dialogFragment.querySelector("dialog");
         document.querySelector("body").appendChild(dialog);
-        var searchForm = dialog.querySelector("form.search-box");
         dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
-        dialog.querySelector("form.search-box").classList.remove("hidden");
+        dialog.querySelector("form.search-box").classList.toggle("hidden", !useSearchForm);
         dialog.querySelector("input.query").value = "";
         dialog.querySelector("section.results ul").innerHTML = "";
+        dialog.querySelector("section.buttons").innerHTML = "";
         dialog.querySelectorAll("section.buttons button").forEach(function (button) {
             button.disabled = true;
         });
+        setupSubmitButtons(dialog, submitButtons);
         FormHandling.addValidation(dialog.querySelector("form.search-box"));
         FormHandling.addValidation(dialog.querySelector("form.search-results"));
+        return dialog;
+    }
+    BigDialog.setupDialog = setupDialog;
+    function setupSubmitButtons(dialog, submitButtons) {
+        var submitButtonTemplate = dialog.querySelector("template.submit-button");
+        var submitButtonContainer = dialog.querySelector(".buttons");
+        submitButtons.forEach(function (buttonInfo) {
+            var submitButtonFragment = document.importNode(submitButtonTemplate.content, true);
+            var submitButtonElement = submitButtonFragment.querySelector("button");
+            submitButtonElement.value = buttonInfo.value;
+            submitButtonElement.title = buttonInfo.title;
+            submitButtonElement.textContent = buttonInfo.text;
+            buttonInfo.classes.forEach(function (buttonClass) {
+                submitButtonElement.classList.add(buttonClass);
+            });
+            submitButtonElement.disabled = true;
+            submitButtonContainer.appendChild(submitButtonFragment);
+        });
+    }
+})(BigDialog || (BigDialog = {}));
+var MediaWikiSearch;
+(function (MediaWikiSearch) {
+    function displayDialog(wikiUrl, callback) {
+        var dialog = BigDialog.setupDialog("Download from Wikisource", true, [
+            {
+                title: "Download and append to text",
+                text: "Append",
+                value: "append",
+                classes: ["fas", "fa-file-medical"]
+            },
+            {
+                title: "Download and replace current text",
+                text: "Download",
+                value: "replace",
+                classes: ["fas", "fa-file-alt"]
+            }
+        ]);
+        var searchForm = dialog.querySelector("form.search-box");
         searchForm.wikiDialog = dialog;
         dialog.wikiUrl = wikiUrl;
         dialog.callback = callback;
         dialog.resultRowTemplate = dialog.querySelector(".result-row");
-        console.log(dialog.resultRowTemplate);
         searchForm.addEventListener("submit", function (event) {
             event.preventDefault();
             var dialog = this.wikiDialog;
@@ -397,7 +435,6 @@ var MediaWikiSearch;
             searchMediaWiki(query, dialog);
         });
         dialog.addEventListener("close", function () {
-            alert("Going once");
             var dialog = this;
             if (dialog.returnValue != "cancel") {
                 var selectedItem = dialog.querySelector(".results input[type=radio][name=title]:checked");
@@ -675,19 +712,26 @@ var NameSearch;
         }
     ];
     function displayDialog(text) {
-        var dialogTemplate = document.querySelector(".big.dialog");
-        var dialogFragment = document.importNode(dialogTemplate, true).content;
-        var dialog = dialogFragment.querySelector("dialog");
-        document.querySelector("body").appendChild(dialog);
-        dialog.querySelector("header h2").innerHTML = "Detected names";
-        dialog.querySelector("form.search-box").classList.add("hidden");
-        FormHandling.addValidation(dialog.querySelector("form.search-results"));
+        var dialog = BigDialog.setupDialog("Detected names", false, [
+            {
+                title: "Append names to lists",
+                text: "Append",
+                value: "append",
+                classes: ["fas", "fa-list"]
+            },
+            {
+                title: "Cancel",
+                text: "Cancel",
+                value: "cancel",
+                classes: ["fas", "fa-ban"]
+            }
+        ]);
         var nameRegex = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
         var possibleNames = findUniqueMatches(text, nameRegex);
         displayMatches(possibleNames, text, dialog);
         dialog.addEventListener("close", function () {
             var dialog = this;
-            if (dialog.returnValue == "insert") {
+            if (dialog.returnValue == "append") {
             }
             dialog.remove();
         });
@@ -750,9 +794,6 @@ var NameSearch;
         }
         regExp.lastIndex = 0;
         return matches;
-    }
-    function GetAllOfType(type, form) {
-        return [];
     }
 })(NameSearch || (NameSearch = {}));
 var FormHandling;
