@@ -1,14 +1,11 @@
-// TODO: Find way to clear event listeners from dialog on closing
-
 // TODO: Find names, categorize them    (?<!\. *) ((:?[A-Z]\w+ *)+)
 // TODO: Warn if loading text & current fields contain data
 
+
+// TODO: Text fields: Sort, remove duplicates, remove empty
 // TODO: Full text preview using XSLT
 
-// TODO: Consolidate big dialogs in HTML
 // TODO: Programmatically construct metadata column contents
-// TODO: Use title for default search
-// TODO: Text fields: Sort, remove duplicates, remove empty
 // TODO: Make XML error more specific (where is the error?)
 
 // TODO: Prettyprint the XML: http://www.eslinstructor.net/vkbeautify/
@@ -30,7 +27,7 @@ interface Globals {
 window.addEventListener("load", function() {
     setupGlobalElements();
     setupToolbar();
-    
+
     XMlHandling.setupXMLValidation();
 });
 
@@ -67,7 +64,9 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        MediaWikiSearch.displayDialog("https://en.wikisource.org", SetTextBody);
+        const title:string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
+
+        MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", SetTextBody);
     });
 
     document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
@@ -102,390 +101,6 @@ function setupToolbar() {
 
         XMlHandling.Clear();
     });
-}
-
-namespace XMlHandling {
-    interface XmlValidatableElement extends HTMLElement {
-        value: string;
-        warningElement: HTMLElement;
-    }
-
-    interface XmlDataPair {
-        xmlElementSelector: string;
-        xmlElementChildrenName?: string;
-        xmlElementAttributes?: AttributePair[];
-        documentElementSelector: string;
-        documentElementType: DocNodeType;
-        documentElementXmlWarningSelector: string;
-    }
-
-    interface AttributePair {
-        text: string;
-        xml: XmlAttribute;
-    }
-
-    interface XmlAttribute {
-        attribute: string;
-        value: string;
-    }
-
-    let domParser: DOMParser = new DOMParser();
-
-    enum DocNodeType {
-        input,
-        textarea
-    }
-
-    const dataPairs: XmlDataPair[] = [
-        {
-            xmlElementSelector: "title",
-            documentElementSelector: ".metadata input[name=title]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.title span"
-        },
-        {
-            xmlElementSelector: "author",
-            documentElementSelector: ".metadata input[name=author]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.author span"
-        },
-        {
-            xmlElementSelector: "written",
-            documentElementSelector: ".metadata input[name=written]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.written span"
-        },
-        {
-            xmlElementSelector: "published",
-            documentElementSelector: ".metadata input[name=published]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.published span"
-        },
-
-        {
-            xmlElementSelector: "summary",
-            documentElementSelector: "main .summary",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: "main .summary-heading"
-        },
-        {
-            xmlElementSelector: "body",
-            documentElementSelector: "main .text",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: "main .text-heading"
-        },
-
-        {
-            xmlElementSelector: "tags",
-            documentElementSelector: ".metadata section.tags textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.tags h2",
-            xmlElementChildrenName: "tag"
-        },
-        {
-            xmlElementSelector: "characters",
-            documentElementSelector: ".metadata section.characters textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.characters h2",
-            xmlElementChildrenName: "character",
-            xmlElementAttributes: [
-                {
-                    text: "m",
-                    xml: {
-                        attribute: "gender",
-                        value: "male"
-                    }
-                },
-                {
-                    text: "f",
-                    xml: {
-                        attribute: "gender",
-                        value: "female"
-                    }
-                },
-                {
-                    text: "o",
-                    xml: {
-                        attribute: "gender",
-                        value: "other"
-                    }
-                },
-                {
-                    text: "u",
-                    xml: {
-                        attribute: "gender",
-                        value: "unknown"
-                    }
-                },
-                {
-                    text: "1",
-                    xml: {
-                        attribute: "type",
-                        value: "main"
-                    }
-                },
-                {
-                    text: "2",
-                    xml: {
-                        attribute: "type",
-                        value: "interacted"
-                    }
-                },
-                {
-                    text: "3",
-                    xml: {
-                        attribute: "type",
-                        value: "mentioned"
-                    }
-                }
-            ]
-        },
-        {
-            xmlElementSelector: "creatures",
-            documentElementSelector: ".metadata section.creatures textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.creatures h2",
-            xmlElementChildrenName: "creature"
-        },
-        {
-            xmlElementSelector: "books",
-            documentElementSelector: ".metadata section.books textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.books h2",
-            xmlElementChildrenName: "book"
-        },
-        {
-            xmlElementSelector: "locations",
-            documentElementSelector: ".metadata section.locations textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.locations h2",
-            xmlElementChildrenName: "location"
-        },
-        {
-            xmlElementSelector: "phobias",
-            documentElementSelector: ".metadata section.phobias textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.phobias h2",
-            xmlElementChildrenName: "phobia"
-        },
-        {
-            xmlElementSelector: "notes",
-            documentElementSelector: ".metadata section.notes textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.notes h2",
-            xmlElementChildrenName: "note"
-        },
-        {
-            xmlElementSelector: "relatedreading",
-            documentElementSelector: ".metadata section.related-links textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.related-links h2",
-            xmlElementChildrenName: "link"
-        }
-    ];
-
-    export function setupXMLValidation(): void {
-        dataPairs.forEach(pair => {
-            let element: XmlValidatableElement = document.querySelector(pair.documentElementSelector);
-
-            element.warningElement = document.querySelector(pair.documentElementXmlWarningSelector);
-
-            element.addEventListener("input", function(event: Event) {
-                let element = this as XmlValidatableElement;
-
-                let xmlString: string = `<body>${element.value}</body>`;
-
-                var testDom = domParser.parseFromString(xmlString, "text/xml");
-
-                element.warningElement.classList.toggle("xmlwarning", !!testDom.querySelector("parsererror"));
-
-                globals.exportButtonElement.disabled = !!testDom.querySelector("parsererror");
-            });
-        });
-    }
-
-    export function makeXML(): string {
-        let xmlTemplate: string = `<?xml version = "1.0"?>
-        <work>
-            <title/>
-            <author/>
-            <written/>
-            <published/>
-            <tags/>
-            <body/>
-            <summary/>
-            <characters/>
-            <creatures/>
-            <books/>
-            <locations/>
-            <phobias/>
-            <notes/>
-            <relatedreading/>
-        </work>
-        `;
-
-        let xmlDocument = domParser.parseFromString(xmlTemplate, "text/xml");
-
-        dataPairs.forEach(pair => {
-            let xmlElement = xmlDocument.querySelector(pair.xmlElementSelector);
-
-            let text: string;
-            if (pair.documentElementType == DocNodeType.input) {
-                let documentElement: HTMLInputElement = document.querySelector(pair.documentElementSelector);
-                text = documentElement.value;
-            } else {
-                let documentElement: HTMLTextAreaElement = document.querySelector(pair.documentElementSelector);
-                text = documentElement.value;
-            }
-
-            if (pair.xmlElementChildrenName) {
-                let lines: string[] = text.split(/[\r\n]+/);
-
-                lines.forEach(line => {
-                    line = line.trim();
-                    if (line.length > 0) {
-                        let xmlChildElement = xmlDocument.createElement(pair.xmlElementChildrenName);
-
-                        // If there might be attributes to be had
-
-                        if (pair.xmlElementAttributes && line.indexOf("|") !== -1) {
-                            let parts: string[] = line.split("|", 2);
-
-                            let attributes: string = parts[0].toLowerCase();
-
-                            pair.xmlElementAttributes.forEach(attributePair => {
-                                // Attribute found
-
-                                if (attributes.indexOf(attributePair.text) !== -1) {
-                                    xmlChildElement.setAttribute(attributePair.xml.attribute, attributePair.xml.value);
-                                }
-                            });
-                            line = parts[1];
-                        }
-
-                        if (line.length > 0) {
-                            xmlChildElement.textContent = line;
-
-                            xmlElement.appendChild(xmlChildElement);
-                        }
-                    }
-                });
-            } else {
-                xmlElement.innerHTML = text;
-            }
-        });
-
-        let serializer: XMLSerializer = new XMLSerializer();
-        let xmlString = serializer.serializeToString(xmlDocument);
-
-        console.log(xmlString);
-
-        return xmlString;
-    }
-
-    export function LoadXml(xmlText: string): void {
-        let XmlDocument = domParser.parseFromString(xmlText, "text/xml");
-
-        dataPairs.forEach(pair => {
-            let xmlElement = XmlDocument.querySelector(pair.xmlElementSelector);
-
-            let documentElement: HTMLInputElement | HTMLTextAreaElement = document.querySelector(
-                pair.documentElementSelector
-            );
-
-            if (pair.xmlElementChildrenName) {
-                let xmlChildElements: NodeListOf<Element> = xmlElement.querySelectorAll(pair.xmlElementChildrenName);
-
-                let textElements: string[] = [];
-
-                xmlChildElements.forEach(childElement => {
-                    let attributePreamble: string = "";
-
-                    if (pair.xmlElementAttributes) {
-                        pair.xmlElementAttributes.forEach(attributePair => {
-                            if (childElement.getAttribute(attributePair.xml.attribute) == attributePair.xml.value) {
-                                attributePreamble += attributePair.text;
-                            }
-                        });
-
-                        attributePreamble += "|";
-                    }
-
-                    textElements.push(attributePreamble + childElement.innerHTML);
-                });
-
-                documentElement.value = textElements.join("\n");
-            } else {
-                documentElement.value = xmlElement.innerHTML;
-            }
-        });
-    }
-
-    export function Clear(): void {
-        DecisionDialog.displayDialog(
-            "Cear all fields",
-            "Are you sure? This will clear all fields and give you a clean slate.",
-            "yes",
-            (decision: string) => {
-                if (decision == "yes") {
-                    dataPairs.forEach(dataPair => {
-                        let elements: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = document.querySelectorAll<
-                            HTMLInputElement | HTMLTextAreaElement
-                        >(dataPair.documentElementSelector);
-
-                        elements.forEach(element => {
-                            element.value = "";
-                        });
-                    });
-                }
-            }
-        );
-    }
-}
-
-namespace FileManagement {
-    export function saveFile(name: string, mime: string, data: string) {
-        if (data != null && navigator.msSaveBlob) return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
-
-        let linkElement = document.createElement("a");
-        linkElement.setAttribute("style", "display:none");
-
-        let url = window.URL.createObjectURL(new Blob([data], { type: mime }));
-
-        linkElement.setAttribute("href", url);
-        linkElement.setAttribute("download", name);
-        //document.appendChild(linkElement);
-        linkElement.click();
-        window.URL.revokeObjectURL(url);
-        linkElement.remove();
-    }
-
-    export function loadFile(callback: (textContent: string) => void) {
-        let inputElement = document.createElement("input");
-        inputElement.type = "file";
-
-        inputElement.addEventListener("change", (event: Event) => {
-            const eventTarget: HTMLInputElement = event.target as HTMLInputElement;
-
-            const file: File = eventTarget.files[0];
-
-            const fileReader: FileReader = new FileReader();
-
-            fileReader.readAsText(file, "utf-8");
-
-            fileReader.addEventListener("load", (event: Event) => {
-                const fileReader: FileReader = event.target as FileReader;
-
-                if ((fileReader.result as string).length == 0) {
-                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
-                }
-
-                callback(fileReader.result as string);
-            });
-        });
-
-        inputElement.click();
-    }
 }
 
 namespace DecisionDialog {
@@ -583,7 +198,6 @@ namespace BigDialog {
     }
 }
 
-
 namespace MediaWikiSearch {
     interface RegexpReplacement {
         description: string;
@@ -625,7 +239,7 @@ namespace MediaWikiSearch {
         checked?: boolean;
     }
 
-    export function displayDialog(wikiUrl: string, callback: (text: string, replace: boolean) => void) {
+    export function displayDialog(defaultSearch: string, wikiUrl: string, callback: (text: string, replace: boolean) => void) {
 
         const dialog: WikiDialog = BigDialog.setupDialog("Download from Wikisource", true,[
             {
@@ -650,6 +264,11 @@ namespace MediaWikiSearch {
         dialog.wikiUrl = wikiUrl;
         dialog.callback = callback;
         dialog.resultRowTemplate = dialog.querySelector(".result-row") as HTMLTemplateElement;
+
+        // Setup default search
+        const searchBox:HTMLInputElement = searchForm.querySelector("input[type=text]") as HTMLInputElement;
+        searchBox.value = defaultSearch;
+        searchForm.dispatchEvent(new Event("input"));
 
         // Setup search action
         searchForm.addEventListener("submit", function(event: Event) {
@@ -720,8 +339,6 @@ namespace MediaWikiSearch {
 
         // Empty old results
         container.innerHTML = "";
-
-        // TODO: Check results for 0-length
 
         if (titles.length == 0) {
             container.innerHTML = `No results found for ${dialog.query}.`;
@@ -1128,6 +745,7 @@ namespace FormHandling {
     export function addValidation(form: HTMLFormElement) {
         form.addEventListener("input", function() {
             let form: HTMLFormElement = this as HTMLFormElement;
+            console.log("hej");
 
             SetSubmitButtonEnabled(form, form.checkValidity());
         });
@@ -1137,5 +755,389 @@ namespace FormHandling {
         (form.querySelectorAll("button[type=submit]") as NodeListOf<HTMLButtonElement>).forEach(button => {
             button.disabled = !state;
         });
+    }
+}
+
+namespace FileManagement {
+    export function saveFile(name: string, mime: string, data: string) {
+        if (data != null && navigator.msSaveBlob) return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
+
+        let linkElement = document.createElement("a");
+        linkElement.setAttribute("style", "display:none");
+
+        let url = window.URL.createObjectURL(new Blob([data], { type: mime }));
+
+        linkElement.setAttribute("href", url);
+        linkElement.setAttribute("download", name);
+        //document.appendChild(linkElement);
+        linkElement.click();
+        window.URL.revokeObjectURL(url);
+        linkElement.remove();
+    }
+
+    export function loadFile(callback: (textContent: string) => void) {
+        let inputElement = document.createElement("input");
+        inputElement.type = "file";
+
+        inputElement.addEventListener("change", (event: Event) => {
+            const eventTarget: HTMLInputElement = event.target as HTMLInputElement;
+
+            const file: File = eventTarget.files[0];
+
+            const fileReader: FileReader = new FileReader();
+
+            fileReader.readAsText(file, "utf-8");
+
+            fileReader.addEventListener("load", (event: Event) => {
+                const fileReader: FileReader = event.target as FileReader;
+
+                if ((fileReader.result as string).length == 0) {
+                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
+                }
+
+                callback(fileReader.result as string);
+            });
+        });
+
+        inputElement.click();
+    }
+}
+
+namespace XMlHandling {
+    interface XmlValidatableElement extends HTMLElement {
+        value: string;
+        warningElement: HTMLElement;
+    }
+
+    interface XmlDataPair {
+        xmlElementSelector: string;
+        xmlElementChildrenName?: string;
+        xmlElementAttributes?: AttributePair[];
+        documentElementSelector: string;
+        documentElementType: DocNodeType;
+        documentElementXmlWarningSelector: string;
+    }
+
+    interface AttributePair {
+        text: string;
+        xml: XmlAttribute;
+    }
+
+    interface XmlAttribute {
+        attribute: string;
+        value: string;
+    }
+
+    let domParser: DOMParser = new DOMParser();
+
+    enum DocNodeType {
+        input,
+        textarea
+    }
+
+    const dataPairs: XmlDataPair[] = [
+        {
+            xmlElementSelector: "title",
+            documentElementSelector: ".metadata input[name=title]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.title span"
+        },
+        {
+            xmlElementSelector: "author",
+            documentElementSelector: ".metadata input[name=author]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.author span"
+        },
+        {
+            xmlElementSelector: "written",
+            documentElementSelector: ".metadata input[name=written]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.written span"
+        },
+        {
+            xmlElementSelector: "published",
+            documentElementSelector: ".metadata input[name=published]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.published span"
+        },
+
+        {
+            xmlElementSelector: "summary",
+            documentElementSelector: "main .summary",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: "main .summary-heading"
+        },
+        {
+            xmlElementSelector: "body",
+            documentElementSelector: "main .text",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: "main .text-heading"
+        },
+
+        {
+            xmlElementSelector: "tags",
+            documentElementSelector: ".metadata section.tags textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.tags h2",
+            xmlElementChildrenName: "tag"
+        },
+        {
+            xmlElementSelector: "characters",
+            documentElementSelector: ".metadata section.characters textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.characters h2",
+            xmlElementChildrenName: "character",
+            xmlElementAttributes: [
+                {
+                    text: "m",
+                    xml: {
+                        attribute: "gender",
+                        value: "male"
+                    }
+                },
+                {
+                    text: "f",
+                    xml: {
+                        attribute: "gender",
+                        value: "female"
+                    }
+                },
+                {
+                    text: "o",
+                    xml: {
+                        attribute: "gender",
+                        value: "other"
+                    }
+                },
+                {
+                    text: "u",
+                    xml: {
+                        attribute: "gender",
+                        value: "unknown"
+                    }
+                },
+                {
+                    text: "1",
+                    xml: {
+                        attribute: "type",
+                        value: "main"
+                    }
+                },
+                {
+                    text: "2",
+                    xml: {
+                        attribute: "type",
+                        value: "interacted"
+                    }
+                },
+                {
+                    text: "3",
+                    xml: {
+                        attribute: "type",
+                        value: "mentioned"
+                    }
+                }
+            ]
+        },
+        {
+            xmlElementSelector: "creatures",
+            documentElementSelector: ".metadata section.creatures textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.creatures h2",
+            xmlElementChildrenName: "creature"
+        },
+        {
+            xmlElementSelector: "books",
+            documentElementSelector: ".metadata section.books textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.books h2",
+            xmlElementChildrenName: "book"
+        },
+        {
+            xmlElementSelector: "locations",
+            documentElementSelector: ".metadata section.locations textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.locations h2",
+            xmlElementChildrenName: "location"
+        },
+        {
+            xmlElementSelector: "phobias",
+            documentElementSelector: ".metadata section.phobias textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.phobias h2",
+            xmlElementChildrenName: "phobia"
+        },
+        {
+            xmlElementSelector: "notes",
+            documentElementSelector: ".metadata section.notes textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.notes h2",
+            xmlElementChildrenName: "note"
+        },
+        {
+            xmlElementSelector: "relatedreading",
+            documentElementSelector: ".metadata section.related-links textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.related-links h2",
+            xmlElementChildrenName: "link"
+        }
+    ];
+
+    export function setupXMLValidation(): void {
+        dataPairs.forEach(pair => {
+            let element: XmlValidatableElement = document.querySelector(pair.documentElementSelector);
+
+            element.warningElement = document.querySelector(pair.documentElementXmlWarningSelector);
+
+            element.addEventListener("input", function(event: Event) {
+                let element = this as XmlValidatableElement;
+
+                let xmlString: string = `<body>${element.value}</body>`;
+
+                var testDom = domParser.parseFromString(xmlString, "text/xml");
+
+                element.warningElement.classList.toggle("xmlwarning", !!testDom.querySelector("parsererror"));
+
+                globals.exportButtonElement.disabled = !!testDom.querySelector("parsererror");
+            });
+        });
+    }
+
+    export function makeXML(): string {
+        let xmlTemplate: string = `<?xml version = "1.0"?>
+        <work>
+            <title/>
+            <author/>
+            <written/>
+            <published/>
+            <tags/>
+            <body/>
+            <summary/>
+            <characters/>
+            <creatures/>
+            <books/>
+            <locations/>
+            <phobias/>
+            <notes/>
+            <relatedreading/>
+        </work>
+        `;
+
+        let xmlDocument = domParser.parseFromString(xmlTemplate, "text/xml");
+
+        dataPairs.forEach(pair => {
+            let xmlElement = xmlDocument.querySelector(pair.xmlElementSelector);
+
+            let text: string;
+            if (pair.documentElementType == DocNodeType.input) {
+                let documentElement: HTMLInputElement = document.querySelector(pair.documentElementSelector);
+                text = documentElement.value;
+            } else {
+                let documentElement: HTMLTextAreaElement = document.querySelector(pair.documentElementSelector);
+                text = documentElement.value;
+            }
+
+            if (pair.xmlElementChildrenName) {
+                let lines: string[] = text.split(/[\r\n]+/);
+
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line.length > 0) {
+                        let xmlChildElement = xmlDocument.createElement(pair.xmlElementChildrenName);
+
+                        // If there might be attributes to be had
+
+                        if (pair.xmlElementAttributes && line.indexOf("|") !== -1) {
+                            let parts: string[] = line.split("|", 2);
+
+                            let attributes: string = parts[0].toLowerCase();
+
+                            pair.xmlElementAttributes.forEach(attributePair => {
+                                // Attribute found
+
+                                if (attributes.indexOf(attributePair.text) !== -1) {
+                                    xmlChildElement.setAttribute(attributePair.xml.attribute, attributePair.xml.value);
+                                }
+                            });
+                            line = parts[1];
+                        }
+
+                        if (line.length > 0) {
+                            xmlChildElement.textContent = line;
+
+                            xmlElement.appendChild(xmlChildElement);
+                        }
+                    }
+                });
+            } else {
+                xmlElement.innerHTML = text;
+            }
+        });
+
+        let serializer: XMLSerializer = new XMLSerializer();
+        let xmlString = serializer.serializeToString(xmlDocument);
+
+        console.log(xmlString);
+
+        return xmlString;
+    }
+
+    export function LoadXml(xmlText: string): void {
+        let XmlDocument = domParser.parseFromString(xmlText, "text/xml");
+
+        dataPairs.forEach(pair => {
+            let xmlElement = XmlDocument.querySelector(pair.xmlElementSelector);
+
+            let documentElement: HTMLInputElement | HTMLTextAreaElement = document.querySelector(
+                pair.documentElementSelector
+            );
+
+            if (pair.xmlElementChildrenName) {
+                let xmlChildElements: NodeListOf<Element> = xmlElement.querySelectorAll(pair.xmlElementChildrenName);
+
+                let textElements: string[] = [];
+
+                xmlChildElements.forEach(childElement => {
+                    let attributePreamble: string = "";
+
+                    if (pair.xmlElementAttributes) {
+                        pair.xmlElementAttributes.forEach(attributePair => {
+                            if (childElement.getAttribute(attributePair.xml.attribute) == attributePair.xml.value) {
+                                attributePreamble += attributePair.text;
+                            }
+                        });
+
+                        attributePreamble += "|";
+                    }
+
+                    textElements.push(attributePreamble + childElement.innerHTML);
+                });
+
+                documentElement.value = textElements.join("\n");
+            } else {
+                documentElement.value = xmlElement.innerHTML;
+            }
+        });
+    }
+
+    export function Clear(): void {
+        DecisionDialog.displayDialog(
+            "Cear all fields",
+            "Are you sure? This will clear all fields and give you a clean slate.",
+            "yes",
+            (decision: string) => {
+                if (decision == "yes") {
+                    dataPairs.forEach(dataPair => {
+                        let elements: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = document.querySelectorAll<
+                            HTMLInputElement | HTMLTextAreaElement
+                        >(dataPair.documentElementSelector);
+
+                        elements.forEach(element => {
+                            element.value = "";
+                        });
+                    });
+                }
+            }
+        );
     }
 }

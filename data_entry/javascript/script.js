@@ -31,7 +31,8 @@ function setupGlobalElements() {
 function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", function (event) {
         event.preventDefault();
-        MediaWikiSearch.displayDialog("https://en.wikisource.org", SetTextBody);
+        var title = document.querySelector(".metadata input[name=title]").value;
+        MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", SetTextBody);
     });
     document.querySelector("section.toolbar button.find-names").addEventListener("click", function (event) {
         event.preventDefault();
@@ -56,297 +57,6 @@ function setupToolbar() {
         XMlHandling.Clear();
     });
 }
-var XMlHandling;
-(function (XMlHandling) {
-    var domParser = new DOMParser();
-    var DocNodeType;
-    (function (DocNodeType) {
-        DocNodeType[DocNodeType["input"] = 0] = "input";
-        DocNodeType[DocNodeType["textarea"] = 1] = "textarea";
-    })(DocNodeType || (DocNodeType = {}));
-    var dataPairs = [
-        {
-            xmlElementSelector: "title",
-            documentElementSelector: ".metadata input[name=title]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.title span"
-        },
-        {
-            xmlElementSelector: "author",
-            documentElementSelector: ".metadata input[name=author]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.author span"
-        },
-        {
-            xmlElementSelector: "written",
-            documentElementSelector: ".metadata input[name=written]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.written span"
-        },
-        {
-            xmlElementSelector: "published",
-            documentElementSelector: ".metadata input[name=published]",
-            documentElementType: DocNodeType.input,
-            documentElementXmlWarningSelector: ".metadata label.published span"
-        },
-        {
-            xmlElementSelector: "summary",
-            documentElementSelector: "main .summary",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: "main .summary-heading"
-        },
-        {
-            xmlElementSelector: "body",
-            documentElementSelector: "main .text",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: "main .text-heading"
-        },
-        {
-            xmlElementSelector: "tags",
-            documentElementSelector: ".metadata section.tags textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.tags h2",
-            xmlElementChildrenName: "tag"
-        },
-        {
-            xmlElementSelector: "characters",
-            documentElementSelector: ".metadata section.characters textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.characters h2",
-            xmlElementChildrenName: "character",
-            xmlElementAttributes: [
-                {
-                    text: "m",
-                    xml: {
-                        attribute: "gender",
-                        value: "male"
-                    }
-                },
-                {
-                    text: "f",
-                    xml: {
-                        attribute: "gender",
-                        value: "female"
-                    }
-                },
-                {
-                    text: "o",
-                    xml: {
-                        attribute: "gender",
-                        value: "other"
-                    }
-                },
-                {
-                    text: "u",
-                    xml: {
-                        attribute: "gender",
-                        value: "unknown"
-                    }
-                },
-                {
-                    text: "1",
-                    xml: {
-                        attribute: "type",
-                        value: "main"
-                    }
-                },
-                {
-                    text: "2",
-                    xml: {
-                        attribute: "type",
-                        value: "interacted"
-                    }
-                },
-                {
-                    text: "3",
-                    xml: {
-                        attribute: "type",
-                        value: "mentioned"
-                    }
-                }
-            ]
-        },
-        {
-            xmlElementSelector: "creatures",
-            documentElementSelector: ".metadata section.creatures textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.creatures h2",
-            xmlElementChildrenName: "creature"
-        },
-        {
-            xmlElementSelector: "books",
-            documentElementSelector: ".metadata section.books textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.books h2",
-            xmlElementChildrenName: "book"
-        },
-        {
-            xmlElementSelector: "locations",
-            documentElementSelector: ".metadata section.locations textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.locations h2",
-            xmlElementChildrenName: "location"
-        },
-        {
-            xmlElementSelector: "phobias",
-            documentElementSelector: ".metadata section.phobias textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.phobias h2",
-            xmlElementChildrenName: "phobia"
-        },
-        {
-            xmlElementSelector: "notes",
-            documentElementSelector: ".metadata section.notes textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.notes h2",
-            xmlElementChildrenName: "note"
-        },
-        {
-            xmlElementSelector: "relatedreading",
-            documentElementSelector: ".metadata section.related-links textarea",
-            documentElementType: DocNodeType.textarea,
-            documentElementXmlWarningSelector: ".metadata section.related-links h2",
-            xmlElementChildrenName: "link"
-        }
-    ];
-    function setupXMLValidation() {
-        dataPairs.forEach(function (pair) {
-            var element = document.querySelector(pair.documentElementSelector);
-            element.warningElement = document.querySelector(pair.documentElementXmlWarningSelector);
-            element.addEventListener("input", function (event) {
-                var element = this;
-                var xmlString = "<body>" + element.value + "</body>";
-                var testDom = domParser.parseFromString(xmlString, "text/xml");
-                element.warningElement.classList.toggle("xmlwarning", !!testDom.querySelector("parsererror"));
-                globals.exportButtonElement.disabled = !!testDom.querySelector("parsererror");
-            });
-        });
-    }
-    XMlHandling.setupXMLValidation = setupXMLValidation;
-    function makeXML() {
-        var xmlTemplate = "<?xml version = \"1.0\"?>\n        <work>\n            <title/>\n            <author/>\n            <written/>\n            <published/>\n            <tags/>\n            <body/>\n            <summary/>\n            <characters/>\n            <creatures/>\n            <books/>\n            <locations/>\n            <phobias/>\n            <notes/>\n            <relatedreading/>\n        </work>\n        ";
-        var xmlDocument = domParser.parseFromString(xmlTemplate, "text/xml");
-        dataPairs.forEach(function (pair) {
-            var xmlElement = xmlDocument.querySelector(pair.xmlElementSelector);
-            var text;
-            if (pair.documentElementType == DocNodeType.input) {
-                var documentElement = document.querySelector(pair.documentElementSelector);
-                text = documentElement.value;
-            }
-            else {
-                var documentElement = document.querySelector(pair.documentElementSelector);
-                text = documentElement.value;
-            }
-            if (pair.xmlElementChildrenName) {
-                var lines = text.split(/[\r\n]+/);
-                lines.forEach(function (line) {
-                    line = line.trim();
-                    if (line.length > 0) {
-                        var xmlChildElement_1 = xmlDocument.createElement(pair.xmlElementChildrenName);
-                        if (pair.xmlElementAttributes && line.indexOf("|") !== -1) {
-                            var parts = line.split("|", 2);
-                            var attributes_1 = parts[0].toLowerCase();
-                            pair.xmlElementAttributes.forEach(function (attributePair) {
-                                if (attributes_1.indexOf(attributePair.text) !== -1) {
-                                    xmlChildElement_1.setAttribute(attributePair.xml.attribute, attributePair.xml.value);
-                                }
-                            });
-                            line = parts[1];
-                        }
-                        if (line.length > 0) {
-                            xmlChildElement_1.textContent = line;
-                            xmlElement.appendChild(xmlChildElement_1);
-                        }
-                    }
-                });
-            }
-            else {
-                xmlElement.innerHTML = text;
-            }
-        });
-        var serializer = new XMLSerializer();
-        var xmlString = serializer.serializeToString(xmlDocument);
-        console.log(xmlString);
-        return xmlString;
-    }
-    XMlHandling.makeXML = makeXML;
-    function LoadXml(xmlText) {
-        var XmlDocument = domParser.parseFromString(xmlText, "text/xml");
-        dataPairs.forEach(function (pair) {
-            var xmlElement = XmlDocument.querySelector(pair.xmlElementSelector);
-            var documentElement = document.querySelector(pair.documentElementSelector);
-            if (pair.xmlElementChildrenName) {
-                var xmlChildElements = xmlElement.querySelectorAll(pair.xmlElementChildrenName);
-                var textElements_1 = [];
-                xmlChildElements.forEach(function (childElement) {
-                    var attributePreamble = "";
-                    if (pair.xmlElementAttributes) {
-                        pair.xmlElementAttributes.forEach(function (attributePair) {
-                            if (childElement.getAttribute(attributePair.xml.attribute) == attributePair.xml.value) {
-                                attributePreamble += attributePair.text;
-                            }
-                        });
-                        attributePreamble += "|";
-                    }
-                    textElements_1.push(attributePreamble + childElement.innerHTML);
-                });
-                documentElement.value = textElements_1.join("\n");
-            }
-            else {
-                documentElement.value = xmlElement.innerHTML;
-            }
-        });
-    }
-    XMlHandling.LoadXml = LoadXml;
-    function Clear() {
-        DecisionDialog.displayDialog("Cear all fields", "Are you sure? This will clear all fields and give you a clean slate.", "yes", function (decision) {
-            if (decision == "yes") {
-                dataPairs.forEach(function (dataPair) {
-                    var elements = document.querySelectorAll(dataPair.documentElementSelector);
-                    elements.forEach(function (element) {
-                        element.value = "";
-                    });
-                });
-            }
-        });
-    }
-    XMlHandling.Clear = Clear;
-})(XMlHandling || (XMlHandling = {}));
-var FileManagement;
-(function (FileManagement) {
-    function saveFile(name, mime, data) {
-        if (data != null && navigator.msSaveBlob)
-            return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
-        var linkElement = document.createElement("a");
-        linkElement.setAttribute("style", "display:none");
-        var url = window.URL.createObjectURL(new Blob([data], { type: mime }));
-        linkElement.setAttribute("href", url);
-        linkElement.setAttribute("download", name);
-        linkElement.click();
-        window.URL.revokeObjectURL(url);
-        linkElement.remove();
-    }
-    FileManagement.saveFile = saveFile;
-    function loadFile(callback) {
-        var inputElement = document.createElement("input");
-        inputElement.type = "file";
-        inputElement.addEventListener("change", function (event) {
-            var eventTarget = event.target;
-            var file = eventTarget.files[0];
-            var fileReader = new FileReader();
-            fileReader.readAsText(file, "utf-8");
-            fileReader.addEventListener("load", function (event) {
-                var fileReader = event.target;
-                if (fileReader.result.length == 0) {
-                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
-                }
-                callback(fileReader.result);
-            });
-        });
-        inputElement.click();
-    }
-    FileManagement.loadFile = loadFile;
-})(FileManagement || (FileManagement = {}));
 var DecisionDialog;
 (function (DecisionDialog) {
     function displayDialog(title, description, dataString, callback) {
@@ -407,7 +117,7 @@ var BigDialog;
 })(BigDialog || (BigDialog = {}));
 var MediaWikiSearch;
 (function (MediaWikiSearch) {
-    function displayDialog(wikiUrl, callback) {
+    function displayDialog(defaultSearch, wikiUrl, callback) {
         var dialog = BigDialog.setupDialog("Download from Wikisource", true, [
             {
                 title: "Download and append to text",
@@ -427,6 +137,9 @@ var MediaWikiSearch;
         dialog.wikiUrl = wikiUrl;
         dialog.callback = callback;
         dialog.resultRowTemplate = dialog.querySelector(".result-row");
+        var searchBox = searchForm.querySelector("input[type=text]");
+        searchBox.value = defaultSearch;
+        searchForm.dispatchEvent(new Event("input"));
         searchForm.addEventListener("submit", function (event) {
             event.preventDefault();
             var dialog = this.wikiDialog;
@@ -801,6 +514,7 @@ var FormHandling;
     function addValidation(form) {
         form.addEventListener("input", function () {
             var form = this;
+            console.log("hej");
             SetSubmitButtonEnabled(form, form.checkValidity());
         });
     }
@@ -812,3 +526,294 @@ var FormHandling;
     }
     FormHandling.SetSubmitButtonEnabled = SetSubmitButtonEnabled;
 })(FormHandling || (FormHandling = {}));
+var FileManagement;
+(function (FileManagement) {
+    function saveFile(name, mime, data) {
+        if (data != null && navigator.msSaveBlob)
+            return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
+        var linkElement = document.createElement("a");
+        linkElement.setAttribute("style", "display:none");
+        var url = window.URL.createObjectURL(new Blob([data], { type: mime }));
+        linkElement.setAttribute("href", url);
+        linkElement.setAttribute("download", name);
+        linkElement.click();
+        window.URL.revokeObjectURL(url);
+        linkElement.remove();
+    }
+    FileManagement.saveFile = saveFile;
+    function loadFile(callback) {
+        var inputElement = document.createElement("input");
+        inputElement.type = "file";
+        inputElement.addEventListener("change", function (event) {
+            var eventTarget = event.target;
+            var file = eventTarget.files[0];
+            var fileReader = new FileReader();
+            fileReader.readAsText(file, "utf-8");
+            fileReader.addEventListener("load", function (event) {
+                var fileReader = event.target;
+                if (fileReader.result.length == 0) {
+                    console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
+                }
+                callback(fileReader.result);
+            });
+        });
+        inputElement.click();
+    }
+    FileManagement.loadFile = loadFile;
+})(FileManagement || (FileManagement = {}));
+var XMlHandling;
+(function (XMlHandling) {
+    var domParser = new DOMParser();
+    var DocNodeType;
+    (function (DocNodeType) {
+        DocNodeType[DocNodeType["input"] = 0] = "input";
+        DocNodeType[DocNodeType["textarea"] = 1] = "textarea";
+    })(DocNodeType || (DocNodeType = {}));
+    var dataPairs = [
+        {
+            xmlElementSelector: "title",
+            documentElementSelector: ".metadata input[name=title]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.title span"
+        },
+        {
+            xmlElementSelector: "author",
+            documentElementSelector: ".metadata input[name=author]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.author span"
+        },
+        {
+            xmlElementSelector: "written",
+            documentElementSelector: ".metadata input[name=written]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.written span"
+        },
+        {
+            xmlElementSelector: "published",
+            documentElementSelector: ".metadata input[name=published]",
+            documentElementType: DocNodeType.input,
+            documentElementXmlWarningSelector: ".metadata label.published span"
+        },
+        {
+            xmlElementSelector: "summary",
+            documentElementSelector: "main .summary",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: "main .summary-heading"
+        },
+        {
+            xmlElementSelector: "body",
+            documentElementSelector: "main .text",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: "main .text-heading"
+        },
+        {
+            xmlElementSelector: "tags",
+            documentElementSelector: ".metadata section.tags textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.tags h2",
+            xmlElementChildrenName: "tag"
+        },
+        {
+            xmlElementSelector: "characters",
+            documentElementSelector: ".metadata section.characters textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.characters h2",
+            xmlElementChildrenName: "character",
+            xmlElementAttributes: [
+                {
+                    text: "m",
+                    xml: {
+                        attribute: "gender",
+                        value: "male"
+                    }
+                },
+                {
+                    text: "f",
+                    xml: {
+                        attribute: "gender",
+                        value: "female"
+                    }
+                },
+                {
+                    text: "o",
+                    xml: {
+                        attribute: "gender",
+                        value: "other"
+                    }
+                },
+                {
+                    text: "u",
+                    xml: {
+                        attribute: "gender",
+                        value: "unknown"
+                    }
+                },
+                {
+                    text: "1",
+                    xml: {
+                        attribute: "type",
+                        value: "main"
+                    }
+                },
+                {
+                    text: "2",
+                    xml: {
+                        attribute: "type",
+                        value: "interacted"
+                    }
+                },
+                {
+                    text: "3",
+                    xml: {
+                        attribute: "type",
+                        value: "mentioned"
+                    }
+                }
+            ]
+        },
+        {
+            xmlElementSelector: "creatures",
+            documentElementSelector: ".metadata section.creatures textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.creatures h2",
+            xmlElementChildrenName: "creature"
+        },
+        {
+            xmlElementSelector: "books",
+            documentElementSelector: ".metadata section.books textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.books h2",
+            xmlElementChildrenName: "book"
+        },
+        {
+            xmlElementSelector: "locations",
+            documentElementSelector: ".metadata section.locations textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.locations h2",
+            xmlElementChildrenName: "location"
+        },
+        {
+            xmlElementSelector: "phobias",
+            documentElementSelector: ".metadata section.phobias textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.phobias h2",
+            xmlElementChildrenName: "phobia"
+        },
+        {
+            xmlElementSelector: "notes",
+            documentElementSelector: ".metadata section.notes textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.notes h2",
+            xmlElementChildrenName: "note"
+        },
+        {
+            xmlElementSelector: "relatedreading",
+            documentElementSelector: ".metadata section.related-links textarea",
+            documentElementType: DocNodeType.textarea,
+            documentElementXmlWarningSelector: ".metadata section.related-links h2",
+            xmlElementChildrenName: "link"
+        }
+    ];
+    function setupXMLValidation() {
+        dataPairs.forEach(function (pair) {
+            var element = document.querySelector(pair.documentElementSelector);
+            element.warningElement = document.querySelector(pair.documentElementXmlWarningSelector);
+            element.addEventListener("input", function (event) {
+                var element = this;
+                var xmlString = "<body>" + element.value + "</body>";
+                var testDom = domParser.parseFromString(xmlString, "text/xml");
+                element.warningElement.classList.toggle("xmlwarning", !!testDom.querySelector("parsererror"));
+                globals.exportButtonElement.disabled = !!testDom.querySelector("parsererror");
+            });
+        });
+    }
+    XMlHandling.setupXMLValidation = setupXMLValidation;
+    function makeXML() {
+        var xmlTemplate = "<?xml version = \"1.0\"?>\n        <work>\n            <title/>\n            <author/>\n            <written/>\n            <published/>\n            <tags/>\n            <body/>\n            <summary/>\n            <characters/>\n            <creatures/>\n            <books/>\n            <locations/>\n            <phobias/>\n            <notes/>\n            <relatedreading/>\n        </work>\n        ";
+        var xmlDocument = domParser.parseFromString(xmlTemplate, "text/xml");
+        dataPairs.forEach(function (pair) {
+            var xmlElement = xmlDocument.querySelector(pair.xmlElementSelector);
+            var text;
+            if (pair.documentElementType == DocNodeType.input) {
+                var documentElement = document.querySelector(pair.documentElementSelector);
+                text = documentElement.value;
+            }
+            else {
+                var documentElement = document.querySelector(pair.documentElementSelector);
+                text = documentElement.value;
+            }
+            if (pair.xmlElementChildrenName) {
+                var lines = text.split(/[\r\n]+/);
+                lines.forEach(function (line) {
+                    line = line.trim();
+                    if (line.length > 0) {
+                        var xmlChildElement_1 = xmlDocument.createElement(pair.xmlElementChildrenName);
+                        if (pair.xmlElementAttributes && line.indexOf("|") !== -1) {
+                            var parts = line.split("|", 2);
+                            var attributes_1 = parts[0].toLowerCase();
+                            pair.xmlElementAttributes.forEach(function (attributePair) {
+                                if (attributes_1.indexOf(attributePair.text) !== -1) {
+                                    xmlChildElement_1.setAttribute(attributePair.xml.attribute, attributePair.xml.value);
+                                }
+                            });
+                            line = parts[1];
+                        }
+                        if (line.length > 0) {
+                            xmlChildElement_1.textContent = line;
+                            xmlElement.appendChild(xmlChildElement_1);
+                        }
+                    }
+                });
+            }
+            else {
+                xmlElement.innerHTML = text;
+            }
+        });
+        var serializer = new XMLSerializer();
+        var xmlString = serializer.serializeToString(xmlDocument);
+        console.log(xmlString);
+        return xmlString;
+    }
+    XMlHandling.makeXML = makeXML;
+    function LoadXml(xmlText) {
+        var XmlDocument = domParser.parseFromString(xmlText, "text/xml");
+        dataPairs.forEach(function (pair) {
+            var xmlElement = XmlDocument.querySelector(pair.xmlElementSelector);
+            var documentElement = document.querySelector(pair.documentElementSelector);
+            if (pair.xmlElementChildrenName) {
+                var xmlChildElements = xmlElement.querySelectorAll(pair.xmlElementChildrenName);
+                var textElements_1 = [];
+                xmlChildElements.forEach(function (childElement) {
+                    var attributePreamble = "";
+                    if (pair.xmlElementAttributes) {
+                        pair.xmlElementAttributes.forEach(function (attributePair) {
+                            if (childElement.getAttribute(attributePair.xml.attribute) == attributePair.xml.value) {
+                                attributePreamble += attributePair.text;
+                            }
+                        });
+                        attributePreamble += "|";
+                    }
+                    textElements_1.push(attributePreamble + childElement.innerHTML);
+                });
+                documentElement.value = textElements_1.join("\n");
+            }
+            else {
+                documentElement.value = xmlElement.innerHTML;
+            }
+        });
+    }
+    XMlHandling.LoadXml = LoadXml;
+    function Clear() {
+        DecisionDialog.displayDialog("Cear all fields", "Are you sure? This will clear all fields and give you a clean slate.", "yes", function (decision) {
+            if (decision == "yes") {
+                dataPairs.forEach(function (dataPair) {
+                    var elements = document.querySelectorAll(dataPair.documentElementSelector);
+                    elements.forEach(function (element) {
+                        element.value = "";
+                    });
+                });
+            }
+        });
+    }
+    XMlHandling.Clear = Clear;
+})(XMlHandling || (XMlHandling = {}));
