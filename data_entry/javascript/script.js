@@ -1,9 +1,4 @@
 var globals;
-window.addEventListener("load", function () {
-    setupGlobalElements();
-    setupToolbar();
-    XMlHandling.setupXMLValidation();
-});
 function SetTextBody(text, replace) {
     if (replace === void 0) { replace = true; }
     if (replace) {
@@ -57,6 +52,10 @@ function setupToolbar() {
         XMlHandling.Clear();
     });
 }
+function setTextareaContents(selector, newContent, append, warnIfNotFull) {
+    var textArea = document.querySelector(selector);
+    textArea.textContent = newContent;
+}
 var DecisionDialog;
 (function (DecisionDialog) {
     function displayDialog(title, description, dataString, callback) {
@@ -84,7 +83,7 @@ var BigDialog;
         var dialogFragment = document.importNode(dialogTemplate, true).content;
         var dialog = dialogFragment.querySelector("dialog");
         document.querySelector("body").appendChild(dialog);
-        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
+        dialog.querySelector("header h2").innerHTML = title;
         dialog.querySelector("form.search-box").classList.toggle("hidden", !useSearchForm);
         dialog.querySelector("input.query").value = "";
         dialog.querySelector("section.results ul").innerHTML = "";
@@ -514,7 +513,6 @@ var FormHandling;
     function addValidation(form) {
         form.addEventListener("input", function () {
             var form = this;
-            console.log("hej");
             SetSubmitButtonEnabled(form, form.checkValidity());
         });
     }
@@ -569,44 +567,51 @@ var XMlHandling;
         DocNodeType[DocNodeType["input"] = 0] = "input";
         DocNodeType[DocNodeType["textarea"] = 1] = "textarea";
     })(DocNodeType || (DocNodeType = {}));
-    var dataPairs = [
+    XMlHandling.dataPairs = [
         {
+            name: "Title",
             xmlElementSelector: "title",
             documentElementSelector: ".metadata input[name=title]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.title span"
         },
         {
+            name: "Author",
             xmlElementSelector: "author",
             documentElementSelector: ".metadata input[name=author]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.author span"
         },
         {
+            name: "Written",
             xmlElementSelector: "written",
             documentElementSelector: ".metadata input[name=written]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.written span"
         },
         {
+            name: "Published",
             xmlElementSelector: "published",
             documentElementSelector: ".metadata input[name=published]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.published span"
         },
         {
+            name: "Summary",
             xmlElementSelector: "summary",
             documentElementSelector: "main .summary",
             documentElementType: DocNodeType.textarea,
             documentElementXmlWarningSelector: "main .summary-heading"
         },
         {
+            name: "Full text",
             xmlElementSelector: "body",
             documentElementSelector: "main .text",
             documentElementType: DocNodeType.textarea,
             documentElementXmlWarningSelector: "main .text-heading"
         },
         {
+            name: "Tags",
             xmlElementSelector: "tags",
             documentElementSelector: ".metadata section.tags textarea",
             documentElementType: DocNodeType.textarea,
@@ -614,6 +619,8 @@ var XMlHandling;
             xmlElementChildrenName: "tag"
         },
         {
+            name: "Characters",
+            containsNames: true,
             xmlElementSelector: "characters",
             documentElementSelector: ".metadata section.characters textarea",
             documentElementType: DocNodeType.textarea,
@@ -672,6 +679,8 @@ var XMlHandling;
             ]
         },
         {
+            name: "Creatures",
+            containsNames: true,
             xmlElementSelector: "creatures",
             documentElementSelector: ".metadata section.creatures textarea",
             documentElementType: DocNodeType.textarea,
@@ -679,6 +688,8 @@ var XMlHandling;
             xmlElementChildrenName: "creature"
         },
         {
+            name: "Books",
+            containsNames: true,
             xmlElementSelector: "books",
             documentElementSelector: ".metadata section.books textarea",
             documentElementType: DocNodeType.textarea,
@@ -686,6 +697,8 @@ var XMlHandling;
             xmlElementChildrenName: "book"
         },
         {
+            name: "Locations",
+            containsNames: true,
             xmlElementSelector: "locations",
             documentElementSelector: ".metadata section.locations textarea",
             documentElementType: DocNodeType.textarea,
@@ -693,6 +706,7 @@ var XMlHandling;
             xmlElementChildrenName: "location"
         },
         {
+            name: "Phobias",
             xmlElementSelector: "phobias",
             documentElementSelector: ".metadata section.phobias textarea",
             documentElementType: DocNodeType.textarea,
@@ -700,6 +714,7 @@ var XMlHandling;
             xmlElementChildrenName: "phobia"
         },
         {
+            name: "Notes",
             xmlElementSelector: "notes",
             documentElementSelector: ".metadata section.notes textarea",
             documentElementType: DocNodeType.textarea,
@@ -707,6 +722,7 @@ var XMlHandling;
             xmlElementChildrenName: "note"
         },
         {
+            name: "Related reading",
             xmlElementSelector: "relatedreading",
             documentElementSelector: ".metadata section.related-links textarea",
             documentElementType: DocNodeType.textarea,
@@ -715,7 +731,7 @@ var XMlHandling;
         }
     ];
     function setupXMLValidation() {
-        dataPairs.forEach(function (pair) {
+        XMlHandling.dataPairs.forEach(function (pair) {
             var element = document.querySelector(pair.documentElementSelector);
             element.warningElement = document.querySelector(pair.documentElementXmlWarningSelector);
             element.addEventListener("input", function (event) {
@@ -731,7 +747,7 @@ var XMlHandling;
     function makeXML() {
         var xmlTemplate = "<?xml version = \"1.0\"?>\n        <work>\n            <title/>\n            <author/>\n            <written/>\n            <published/>\n            <tags/>\n            <body/>\n            <summary/>\n            <characters/>\n            <creatures/>\n            <books/>\n            <locations/>\n            <phobias/>\n            <notes/>\n            <relatedreading/>\n        </work>\n        ";
         var xmlDocument = domParser.parseFromString(xmlTemplate, "text/xml");
-        dataPairs.forEach(function (pair) {
+        XMlHandling.dataPairs.forEach(function (pair) {
             var xmlElement = xmlDocument.querySelector(pair.xmlElementSelector);
             var text;
             if (pair.documentElementType == DocNodeType.input) {
@@ -771,13 +787,12 @@ var XMlHandling;
         });
         var serializer = new XMLSerializer();
         var xmlString = serializer.serializeToString(xmlDocument);
-        console.log(xmlString);
         return xmlString;
     }
     XMlHandling.makeXML = makeXML;
     function LoadXml(xmlText) {
         var XmlDocument = domParser.parseFromString(xmlText, "text/xml");
-        dataPairs.forEach(function (pair) {
+        XMlHandling.dataPairs.forEach(function (pair) {
             var xmlElement = XmlDocument.querySelector(pair.xmlElementSelector);
             var documentElement = document.querySelector(pair.documentElementSelector);
             if (pair.xmlElementChildrenName) {
@@ -806,7 +821,7 @@ var XMlHandling;
     function Clear() {
         DecisionDialog.displayDialog("Cear all fields", "Are you sure? This will clear all fields and give you a clean slate.", "yes", function (decision) {
             if (decision == "yes") {
-                dataPairs.forEach(function (dataPair) {
+                XMlHandling.dataPairs.forEach(function (dataPair) {
                     var elements = document.querySelectorAll(dataPair.documentElementSelector);
                     elements.forEach(function (element) {
                         element.value = "";
@@ -817,3 +832,6 @@ var XMlHandling;
     }
     XMlHandling.Clear = Clear;
 })(XMlHandling || (XMlHandling = {}));
+setupGlobalElements();
+setupToolbar();
+XMlHandling.setupXMLValidation();

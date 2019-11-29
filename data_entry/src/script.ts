@@ -1,7 +1,6 @@
 // TODO: Find names, categorize them    (?<!\. *) ((:?[A-Z]\w+ *)+)
 // TODO: Warn if loading text & current fields contain data
 
-
 // TODO: Text fields: Sort, remove duplicates, remove empty
 // TODO: Full text preview using XSLT
 
@@ -9,6 +8,7 @@
 // TODO: Make XML error more specific (where is the error?)
 
 // TODO: Prettyprint the XML: http://www.eslinstructor.net/vkbeautify/
+
 
 let globals: Globals;
 
@@ -21,15 +21,6 @@ interface Globals {
     exportButtonElement: HTMLButtonElement;
     textBodyElement: HTMLTextAreaElement;
 }
-
-/* PAGE ONLOAD */
-
-window.addEventListener("load", function() {
-    setupGlobalElements();
-    setupToolbar();
-
-    XMlHandling.setupXMLValidation();
-});
 
 function SetTextBody(text: string, replace: boolean = true) {
     if (replace) {
@@ -103,6 +94,18 @@ function setupToolbar() {
     });
 }
 
+function getTextareaContents(selector: string): string {
+    return (document.querySelector(selector) as HTMLTextAreaElement).textContent;
+}
+
+function setTextareaContents(selector: string, newContent: string, warnIfNotFull: boolean) {
+
+    const textArea:HTMLTextAreaElement = document.querySelector(selector);
+
+    textArea.textContent = newContent;
+}
+
+
 namespace DecisionDialog {
     interface DecisionDialog extends HTMLDialogElement {
         dataString?: string;
@@ -153,7 +156,7 @@ namespace BigDialog {
         document.querySelector("body").appendChild(dialog);
 
         // Config dialog
-        dialog.querySelector("header h2").innerHTML = "Download from Wikisource";
+        dialog.querySelector("header h2").innerHTML = title;
         dialog.querySelector("form.search-box").classList.toggle("hidden", !useSearchForm);
 
         // Reset dialog
@@ -745,7 +748,6 @@ namespace FormHandling {
     export function addValidation(form: HTMLFormElement) {
         form.addEventListener("input", function() {
             let form: HTMLFormElement = this as HTMLFormElement;
-            console.log("hej");
 
             SetSubmitButtonEnabled(form, form.checkValidity());
         });
@@ -810,6 +812,8 @@ namespace XMlHandling {
     }
 
     interface XmlDataPair {
+        name: string;
+        containsNames?: boolean;
         xmlElementSelector: string;
         xmlElementChildrenName?: string;
         xmlElementAttributes?: AttributePair[];
@@ -835,26 +839,30 @@ namespace XMlHandling {
         textarea
     }
 
-    const dataPairs: XmlDataPair[] = [
+    export const dataPairs: XmlDataPair[] = [
         {
+            name: "Title",
             xmlElementSelector: "title",
             documentElementSelector: ".metadata input[name=title]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.title span"
         },
         {
+            name: "Author",
             xmlElementSelector: "author",
             documentElementSelector: ".metadata input[name=author]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.author span"
         },
         {
+            name: "Written",
             xmlElementSelector: "written",
             documentElementSelector: ".metadata input[name=written]",
             documentElementType: DocNodeType.input,
             documentElementXmlWarningSelector: ".metadata label.written span"
         },
         {
+            name: "Published",
             xmlElementSelector: "published",
             documentElementSelector: ".metadata input[name=published]",
             documentElementType: DocNodeType.input,
@@ -862,12 +870,14 @@ namespace XMlHandling {
         },
 
         {
+            name: "Summary",
             xmlElementSelector: "summary",
             documentElementSelector: "main .summary",
             documentElementType: DocNodeType.textarea,
             documentElementXmlWarningSelector: "main .summary-heading"
         },
         {
+            name: "Full text",
             xmlElementSelector: "body",
             documentElementSelector: "main .text",
             documentElementType: DocNodeType.textarea,
@@ -875,6 +885,7 @@ namespace XMlHandling {
         },
 
         {
+            name: "Tags",
             xmlElementSelector: "tags",
             documentElementSelector: ".metadata section.tags textarea",
             documentElementType: DocNodeType.textarea,
@@ -882,6 +893,8 @@ namespace XMlHandling {
             xmlElementChildrenName: "tag"
         },
         {
+            name: "Characters",
+            containsNames: true,
             xmlElementSelector: "characters",
             documentElementSelector: ".metadata section.characters textarea",
             documentElementType: DocNodeType.textarea,
@@ -940,6 +953,8 @@ namespace XMlHandling {
             ]
         },
         {
+            name: "Creatures",
+            containsNames: true,
             xmlElementSelector: "creatures",
             documentElementSelector: ".metadata section.creatures textarea",
             documentElementType: DocNodeType.textarea,
@@ -947,6 +962,8 @@ namespace XMlHandling {
             xmlElementChildrenName: "creature"
         },
         {
+            name: "Books",
+            containsNames: true,
             xmlElementSelector: "books",
             documentElementSelector: ".metadata section.books textarea",
             documentElementType: DocNodeType.textarea,
@@ -954,6 +971,8 @@ namespace XMlHandling {
             xmlElementChildrenName: "book"
         },
         {
+            name: "Locations",
+            containsNames: true,
             xmlElementSelector: "locations",
             documentElementSelector: ".metadata section.locations textarea",
             documentElementType: DocNodeType.textarea,
@@ -961,6 +980,7 @@ namespace XMlHandling {
             xmlElementChildrenName: "location"
         },
         {
+            name: "Phobias",
             xmlElementSelector: "phobias",
             documentElementSelector: ".metadata section.phobias textarea",
             documentElementType: DocNodeType.textarea,
@@ -968,6 +988,7 @@ namespace XMlHandling {
             xmlElementChildrenName: "phobia"
         },
         {
+            name: "Notes",
             xmlElementSelector: "notes",
             documentElementSelector: ".metadata section.notes textarea",
             documentElementType: DocNodeType.textarea,
@@ -975,6 +996,7 @@ namespace XMlHandling {
             xmlElementChildrenName: "note"
         },
         {
+            name: "Related reading",
             xmlElementSelector: "relatedreading",
             documentElementSelector: ".metadata section.related-links textarea",
             documentElementType: DocNodeType.textarea,
@@ -1077,8 +1099,6 @@ namespace XMlHandling {
         let serializer: XMLSerializer = new XMLSerializer();
         let xmlString = serializer.serializeToString(xmlDocument);
 
-        console.log(xmlString);
-
         return xmlString;
     }
 
@@ -1141,3 +1161,12 @@ namespace XMlHandling {
         );
     }
 }
+
+
+
+/* PAGE ONLOAD */
+
+setupGlobalElements();
+setupToolbar();
+
+XMlHandling.setupXMLValidation();
