@@ -75,7 +75,6 @@ function setupToolbar() {
     });
 }
 
-
 setupToolbar();
 
 XMLHandling.setupXMLValidation();
