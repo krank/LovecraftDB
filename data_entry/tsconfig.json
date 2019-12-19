@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "outDir": "./javascript/",
-    "rootDir": "./src/",
     "module": "commonjs",
     "removeComments": true
   }
