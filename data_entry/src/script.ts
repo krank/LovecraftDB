@@ -1,5 +1,8 @@
-// TODO: Find names, categorize them    (?<!\. *) ((:?[A-Z]\w+ *)+)
+// TODO: Mark already-entered names in namesearch listing
+
 // TODO: Warn if loading text & current fields contain data
+
+// TODO: Rebuild structure of "XmlDataPairs" into something more generic, usable in the entire program
 
 // TODO: Text fields: Sort, remove duplicates, remove empty
 // TODO: Full text preview using XSLT
@@ -8,7 +11,6 @@
 // TODO: Make XML error more specific (where is the error?)
 
 // TODO: Prettyprint the XML: http://www.eslinstructor.net/vkbeautify/
-
 
 let globals: Globals;
 
@@ -55,7 +57,7 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        const title:string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
+        const title: string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
 
         MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", SetTextBody);
     });
@@ -68,7 +70,7 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        let xmlString: string = XMlHandling.makeXML();
+        let xmlString: string = XMLHandling.makeXML();
 
         let title: string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
 
@@ -84,13 +86,13 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.import").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        FileManagement.loadFile(XMlHandling.LoadXml);
+        FileManagement.loadFile(XMLHandling.LoadXml);
     });
 
     document.querySelector("section.toolbar button.clear").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        XMlHandling.Clear();
+        XMLHandling.Clear();
     });
 }
 
@@ -99,12 +101,10 @@ function getTextareaContents(selector: string): string {
 }
 
 function setTextareaContents(selector: string, newContent: string, warnIfNotFull: boolean) {
-
-    const textArea:HTMLTextAreaElement = document.querySelector(selector);
+    const textArea: HTMLTextAreaElement = document.querySelector(selector);
 
     textArea.textContent = newContent;
 }
-
 
 namespace DecisionDialog {
     interface DecisionDialog extends HTMLDialogElement {
@@ -142,13 +142,17 @@ namespace DecisionDialog {
 
 namespace BigDialog {
     interface ButtonElementInfo {
-        text: string,
-        value: string,
-        title: string,
-        classes: string[]
+        text: string;
+        value: string;
+        title: string;
+        classes: string[];
     }
 
-    export function setupDialog(title: string, useSearchForm: boolean, submitButtons: ButtonElementInfo[] ): HTMLDialogElement {
+    export function setupDialog(
+        title: string,
+        useSearchForm: boolean,
+        submitButtons: ButtonElementInfo[]
+    ): HTMLDialogElement {
         // Dialog element creation
         const dialogTemplate: HTMLTemplateElement = document.querySelector(".big.dialog");
         const dialogFragment: DocumentFragment = document.importNode(dialogTemplate, true).content;
@@ -179,12 +183,12 @@ namespace BigDialog {
     }
 
     function setupSubmitButtons(dialog: HTMLDialogElement, submitButtons: ButtonElementInfo[]) {
-        const submitButtonTemplate:HTMLTemplateElement = dialog.querySelector("template.submit-button");
-        const submitButtonContainer:HTMLElement = dialog.querySelector(".buttons");
+        const submitButtonTemplate: HTMLTemplateElement = dialog.querySelector("template.submit-button");
+        const submitButtonContainer: HTMLElement = dialog.querySelector(".buttons");
 
         submitButtons.forEach(buttonInfo => {
-            const submitButtonFragment:DocumentFragment = document.importNode(submitButtonTemplate.content, true);
-            const submitButtonElement:HTMLButtonElement = submitButtonFragment.querySelector("button");
+            const submitButtonFragment: DocumentFragment = document.importNode(submitButtonTemplate.content, true);
+            const submitButtonElement: HTMLButtonElement = submitButtonFragment.querySelector("button");
 
             submitButtonElement.value = buttonInfo.value;
             submitButtonElement.title = buttonInfo.title;
@@ -192,7 +196,7 @@ namespace BigDialog {
 
             buttonInfo.classes.forEach(buttonClass => {
                 submitButtonElement.classList.add(buttonClass);
-            })
+            });
 
             submitButtonElement.disabled = true;
 
@@ -242,9 +246,12 @@ namespace MediaWikiSearch {
         checked?: boolean;
     }
 
-    export function displayDialog(defaultSearch: string, wikiUrl: string, callback: (text: string, replace: boolean) => void) {
-
-        const dialog: WikiDialog = BigDialog.setupDialog("Download from Wikisource", true,[
+    export function displayDialog(
+        defaultSearch: string,
+        wikiUrl: string,
+        callback: (text: string, replace: boolean) => void
+    ) {
+        const dialog: WikiDialog = BigDialog.setupDialog("Download from Wikisource", true, [
             {
                 title: "Download and append to text",
                 text: "Append",
@@ -255,7 +262,7 @@ namespace MediaWikiSearch {
                 title: "Download and replace current text",
                 text: "Download",
                 value: "replace",
-                classes: ["fas","fa-file-alt"]
+                classes: ["fas", "fa-file-alt"]
             }
         ]) as WikiDialog;
 
@@ -269,7 +276,7 @@ namespace MediaWikiSearch {
         dialog.resultRowTemplate = dialog.querySelector(".result-row") as HTMLTemplateElement;
 
         // Setup default search
-        const searchBox:HTMLInputElement = searchForm.querySelector("input[type=text]") as HTMLInputElement;
+        const searchBox: HTMLInputElement = searchForm.querySelector("input[type=text]") as HTMLInputElement;
         searchBox.value = defaultSearch;
         searchForm.dispatchEvent(new Event("input"));
 
@@ -582,7 +589,6 @@ namespace MediaWikiSearch {
 }
 
 namespace NameSearch {
-
     interface RegexGroup {
         matchText: string;
         indexStart: number;
@@ -593,6 +599,11 @@ namespace NameSearch {
         value: string;
         text: string;
         checked?: boolean;
+    }
+
+    interface CategoryResult {
+        dataPair: XMLHandling.XmlDataPair;
+        content: string[];
     }
 
     const itemOptions: ItemOption[] = [
@@ -620,8 +631,7 @@ namespace NameSearch {
     ];
 
     export function displayDialog(text: string) {
-
-        const dialog:HTMLDialogElement = BigDialog.setupDialog("Detected names", false, [
+        const dialog: HTMLDialogElement = BigDialog.setupDialog("Detected names", false, [
             {
                 title: "Append names to lists",
                 text: "Append",
@@ -632,9 +642,9 @@ namespace NameSearch {
                 title: "Cancel",
                 text: "Cancel",
                 value: "cancel",
-                classes: ["fas","fa-ban"]
+                classes: ["fas", "fa-ban"]
             }
-        ])
+        ]);
 
         // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
         // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
@@ -649,7 +659,56 @@ namespace NameSearch {
             let dialog = this as HTMLDialogElement;
 
             if (dialog.returnValue == "append") {
-                // TODO: Gather all names that have been categorized
+
+                // Construct "categorized" object from data pairs
+
+                let categorized: Record<string, CategoryResult> = {};
+
+                let dataPairs = XMLHandling.dataPairs.filter(pair => pair.containsNames == true);
+
+                dataPairs.forEach(pair => {
+                    categorized[pair.xmlElementChildrenName] = {
+                        dataPair: pair,
+                        content: []
+                    };
+                });
+
+                // Gather all the categorized names
+                let checkedElements: NodeListOf<HTMLInputElement> = dialog.querySelectorAll(
+                    "input[type=radio]:checked:not([value=ignore])"
+                );
+
+                checkedElements.forEach(element => {
+                    // Check to make sure element value (category name) exists as property of categorized object
+                    if (Object.keys(categorized).indexOf(element.value) >= 0) {
+                        let category: string[] = categorized[element.value].content;
+
+                        category.push(element.name);
+                    }
+                });
+
+                // TODO: Use description text field for name, not merely element's name (which may have changed)
+
+                console.log(categorized);
+
+                // Go through the categorized names and append them to their respective textareas
+
+                Object.keys(categorized).forEach(categoryName => {
+
+                    let category = categorized[categoryName];
+
+                    let currentTextContent = getTextareaContents(category.dataPair.documentElementSelector)
+
+                    let newTextContent = category.content.join("\n");
+
+                    if (currentTextContent.length == 0) {
+                        setTextareaContents(category.dataPair.documentElementSelector, newTextContent, false);
+                    } else {
+                        setTextareaContents(category.dataPair.documentElementSelector, currentTextContent + "\n" + newTextContent, false);
+                    }
+                })
+
+
             }
             dialog.remove();
         });
@@ -760,7 +819,9 @@ namespace FormHandling {
     }
 }
 
-namespace FileManagement {
+import * as FileManagement from "./filemanagement";
+
+/*namespace FileManagement {
     export function saveFile(name: string, mime: string, data: string) {
         if (data != null && navigator.msSaveBlob) return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
 
@@ -803,15 +864,15 @@ namespace FileManagement {
 
         inputElement.click();
     }
-}
+}*/
 
-namespace XMlHandling {
+namespace XMLHandling {
     interface XmlValidatableElement extends HTMLElement {
         value: string;
         warningElement: HTMLElement;
     }
 
-    interface XmlDataPair {
+    export interface XmlDataPair {
         name: string;
         containsNames?: boolean;
         xmlElementSelector: string;
@@ -1162,11 +1223,7 @@ namespace XMlHandling {
     }
 }
 
-
-
-/* PAGE ONLOAD */
-
 setupGlobalElements();
 setupToolbar();
 
-XMlHandling.setupXMLValidation();
+XMLHandling.setupXMLValidation();
