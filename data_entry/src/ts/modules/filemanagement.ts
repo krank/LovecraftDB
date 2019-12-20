@@ -1,3 +1,6 @@
+import * as Interfaces from "./interfaces";
+
+
 export function saveFile(name: string, mime: string, data: string) {
     if (data != null && navigator.msSaveBlob) return navigator.msSaveBlob(new Blob([data], { type: mime }), name);
 
@@ -14,7 +17,7 @@ export function saveFile(name: string, mime: string, data: string) {
     linkElement.remove();
 }
 
-export function loadFile(callback: (textContent: string) => void) {
+export function loadFile(callback: (textContent: string, config:Interfaces.DataBlob[]) => void, config:Interfaces.DataBlob[]) {
     let inputElement = document.createElement("input");
     inputElement.type = "file";
 
@@ -34,7 +37,7 @@ export function loadFile(callback: (textContent: string) => void) {
                 console.log("Uh-oh, spaghetti-o's! That file seems empty, just like my soul.");
             }
 
-            callback(fileReader.result as string);
+            callback(fileReader.result as string, config);
         });
     });
 

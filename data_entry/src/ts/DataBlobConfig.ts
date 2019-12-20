@@ -190,9 +190,9 @@ export const dataBlobs: Interfaces.DataBlob[] = [
     type: Interfaces.BlobType.main,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
-    documentElementClass: "entities",
+    documentElementClass: "fulltext",
 
-    xmlElementName: "entities",
+    xmlElementName: "body",
     
   },
   {

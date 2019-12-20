@@ -7,6 +7,8 @@ import * as FullTextManagement from "./modules/fulltextmanagement";
 import * as MediaWikiSearch from "./modules/mediawikisearch";
 import * as NameSearch from "./modules/namesearch";
 
+import * as Config from "./DataBlobConfig";
+
 function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", (event: Event) => {
         event.preventDefault();
@@ -18,7 +20,6 @@ function setupToolbar() {
 
     document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
         event.preventDefault();
-        //let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.textcode");
 
         NameSearch.displayDialog(FullTextManagement.GetTextBody());
     });
@@ -26,7 +27,7 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        let xmlString: string = XMLHandling.makeXML();
+        let xmlString: string = XMLHandling.makeXML(Config.dataBlobs);
 
         let title: string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
 
@@ -42,16 +43,16 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.import").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        FileManagement.loadFile(XMLHandling.LoadXml);
+        FileManagement.loadFile(XMLHandling.LoadXml, Config.dataBlobs);
     });
 
     document.querySelector("section.toolbar button.clear").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        XMLHandling.Clear();
+        XMLHandling.Clear(Config.dataBlobs);
     });
 }
 
 setupToolbar();
 
-XMLHandling.setupXMLValidation();
+XMLHandling.setupXMLValidation(Config.dataBlobs);
