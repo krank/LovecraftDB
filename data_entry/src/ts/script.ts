@@ -21,7 +21,7 @@ function setupToolbar() {
     document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        NameSearch.displayDialog(FullTextManagement.GetTextBody());
+        NameSearch.displayDialog(FullTextManagement.GetTextBody(), Config.dataBlobs);
     });
 
     document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {

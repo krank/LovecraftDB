@@ -23,6 +23,7 @@ export interface XmlAttribute {
 export interface DataBlob {
   name: string,
   type: BlobType,
+  containsNames?: boolean,
 
   attributePairs?: AttributePair[],
   

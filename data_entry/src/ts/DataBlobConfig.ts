@@ -56,6 +56,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   {
     name: "Characters",
     type: Interfaces.BlobType.list,
+    containsNames: true,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "characters",
@@ -119,6 +120,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   {
     name: "Mythos entities",
     type: Interfaces.BlobType.list,
+    containsNames: true,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "entities",
@@ -130,6 +132,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   {
     name: "Books",
     type: Interfaces.BlobType.list,
+    containsNames: true,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "books",
@@ -141,6 +144,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   {
     name: "Locations",
     type: Interfaces.BlobType.list,
+    containsNames: true,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "locations",

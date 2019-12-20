@@ -1,7 +1,6 @@
 import * as BigDialog from "./bigdialog";
-import * as XMLHandling from "./xmlhandling";
-import * as TextAreaManagement from "./textareamanagement";
-
+import * as Interfaces from "./interfaces";
+import * as DomManagement from "./dommanagement";
 
 
 interface RegexGroup {
@@ -17,18 +16,18 @@ interface ItemOption {
 }
 
 interface CategoryResult {
-  dataPair: XMLHandling.XmlDataPair;
+  dataPair: Interfaces.DataBlob;
   content: string[];
 }
 
-const itemOptions: ItemOption[] = [
+/*const itemOptions: ItemOption[] = [
   {
     text: "Character",
     value: "character"
   },
   {
-    text: "Creature",
-    value: "creature"
+    text: "Entity",
+    value: "entity"
   },
   {
     text: "Location",
@@ -43,9 +42,33 @@ const itemOptions: ItemOption[] = [
     value: "ignore",
     checked: true
   }
-];
+];*/
 
-export function displayDialog(text: string) {
+function generateItemOptions(Config: Interfaces.DataBlob[]): ItemOption[] {
+
+  let dataBlobs = Config.filter(pair => pair.containsNames == true);
+
+  let itemOptions = [];
+
+  dataBlobs.forEach(dataBlob => {
+    itemOptions.push({
+      text: dataBlob.xmlElementChildrenName.charAt(0).toUpperCase() + dataBlob.xmlElementChildrenName.slice(1),
+      value: dataBlob.xmlElementChildrenName
+    });
+  });
+
+  itemOptions.push( {
+    text: "Ignore",
+    value: "ignore",
+    checked: true
+  })
+
+  return itemOptions;
+
+}
+
+
+export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
   const dialog: HTMLDialogElement = BigDialog.setupDialog("Detected names", false, [
     {
       title: "Append names to lists",
@@ -67,7 +90,7 @@ export function displayDialog(text: string) {
 
   let possibleNames = findUniqueMatches(text, nameRegex);
 
-  displayMatches(possibleNames, text, dialog);
+  displayMatches(possibleNames, text, dialog, generateItemOptions(Config));
 
   // Setup dialog closing action
   dialog.addEventListener("close", function () {
@@ -79,11 +102,11 @@ export function displayDialog(text: string) {
 
       let categorized: Record<string, CategoryResult> = {};
 
-      let dataPairs = XMLHandling.dataPairs.filter(pair => pair.containsNames == true);
+      let dataBlobs = Config.filter(pair => pair.containsNames == true);
 
-      dataPairs.forEach(pair => {
-        categorized[pair.xmlElementChildrenName] = {
-          dataPair: pair,
+      dataBlobs.forEach(dataBlob => {
+        categorized[dataBlob.xmlElementChildrenName] = {
+          dataPair: dataBlob,
           content: []
         };
       });
@@ -112,14 +135,18 @@ export function displayDialog(text: string) {
 
         let category = categorized[categoryName];
 
-        let currentTextContent = TextAreaManagement.getTextareaContents(category.dataPair.documentElementSelector)
+        let domElements = DomManagement.getHtmlElementOf(category.dataPair, false);
+
+        let currentTextContent = (domElements.element as HTMLInputElement | HTMLTextAreaElement).value;
 
         let newTextContent = category.content.join("\n");
 
         if (currentTextContent.length == 0) {
-          TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, newTextContent, false);
+          (domElements.element as HTMLInputElement | HTMLTextAreaElement).value = newTextContent;
+          //TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, newTextContent, false);
         } else {
-          TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, currentTextContent + "\n" + newTextContent, false);
+          (domElements.element as HTMLInputElement | HTMLTextAreaElement).value = currentTextContent + "\n" + newTextContent;
+          //TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, currentTextContent + "\n" + newTextContent, false);
         }
       })
 
@@ -131,7 +158,7 @@ export function displayDialog(text: string) {
   dialog.showModal();
 }
 
-function displayMatches(matches: RegexGroup[], text: string, dialog: HTMLDialogElement) {
+function displayMatches(matches: RegexGroup[], text: string, dialog: HTMLDialogElement, itemOptions: ItemOption[]) {
   const resultsContainer: HTMLElement = dialog.querySelector(".results ul");
 
   resultsContainer.innerHTML = "";
@@ -148,6 +175,8 @@ function displayMatches(matches: RegexGroup[], text: string, dialog: HTMLDialogE
 
       textElement.innerText = match.matchText;
       detailsElement.innerHTML = makeAbstract(match, text);
+
+      // Om bara ItemOptions finns HÄR så funkar resten…?
 
       makeOptionItems(match.matchText, itemOptions, rowElement, optionTemplate);
 

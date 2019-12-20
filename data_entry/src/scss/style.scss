@@ -456,7 +456,7 @@ input[type="radio"][value="character"] ~ span.text::before {
   content: "";
 }
 
-input[type="radio"][value="creature"] ~ span.text::before {
+input[type="radio"][value="entity"] ~ span.text::before {
   content: "";
 }
 
