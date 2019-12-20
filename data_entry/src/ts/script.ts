@@ -18,8 +18,9 @@ function setupToolbar() {
 
     document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
         event.preventDefault();
-        let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.text");
-        NameSearch.displayDialog(textBodyElement.value);
+        //let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.textcode");
+
+        NameSearch.displayDialog(FullTextManagement.GetTextBody());
     });
 
     document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {

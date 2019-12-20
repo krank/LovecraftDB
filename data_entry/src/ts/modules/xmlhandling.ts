@@ -74,7 +74,7 @@ export const dataPairs: XmlDataPair[] = [
   {
     name: "Full text",
     xmlElementSelector: "body",
-    documentElementSelector: "main .text",
+    documentElementSelector: "main .textcode",
     documentElementType: DocNodeType.textarea,
     documentElementXmlWarningSelector: "main .text-heading"
   },

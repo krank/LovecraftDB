@@ -154,7 +154,7 @@ main {
       "code html ."
       "panel panel panel";
 
-    textarea.text {
+    textarea.textcode {
       min-height: 8em;
     }
 
@@ -175,9 +175,10 @@ main {
       grid-area: html;
     }
 
-    textarea.text {
+    textarea.textcode {
       grid-area: panel;
     }
+    
 
     div.htmltext {
       grid-area: panel;
@@ -201,13 +202,13 @@ main {
       z-index: 255;
     }
 
-    #code:checked ~ textarea.text,
+    #code:checked ~ textarea.textcode,
     #html:checked ~ div.htmltext {
       display: block;
     }
 
     div.htmltext,
-    textarea.text {
+    textarea.textcode {
       display: none;
     }
   }
@@ -507,14 +508,15 @@ input[type="radio"][value="ignore"] ~ span.text::before {
     position: sticky;
   }
 
-  main textarea.text {
-    min-height: 20em;
-    resize: vertical;
-  }
-
   main {
     box-sizing: border-box;
     padding-left: 1em;
     padding-right: 1em;
+
+    textarea.textcode {
+      min-height: 20em;
+      resize: vertical;
+    }
+
   }
 }
