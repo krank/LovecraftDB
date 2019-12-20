@@ -2,34 +2,10 @@
 import * as XMLHandling from "./modules/xmlhandling";
 import * as FileManagement from "./modules/filemanagement";
 
-import * as DecisionDialog from "./modules/decisiondialog";
+import * as FullTextManagement from "./modules/fulltextmanagement";
 
 import * as MediaWikiSearch from "./modules/mediawikisearch";
 import * as NameSearch from "./modules/namesearch";
-
-function SetTextBody(text: string, replace: boolean = true) {
-
-    let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.text");
-
-    if (replace) {
-        if (textBodyElement.value.length != 0) {
-            DecisionDialog.displayDialog(
-                "Replace",
-                "Are you sure? This will mean losing the current text body.",
-                text,
-                function(text: string) {
-                    textBodyElement.value = text;
-                }
-            );
-        } else {
-            textBodyElement.value = text;
-        }
-    } else {
-        textBodyElement.value += "\n\n" + text;
-    }
-
-    textBodyElement.dispatchEvent(new Event("input", { bubbles: true }));
-}
 
 function setupToolbar() {
     document.querySelector("section.toolbar button.wikisource").addEventListener("click", (event: Event) => {
@@ -37,7 +13,7 @@ function setupToolbar() {
 
         const title: string = (document.querySelector(".metadata input[name=title]") as HTMLInputElement).value;
 
-        MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", SetTextBody);
+        MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", FullTextManagement.SetTextBody);
     });
 
     document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {

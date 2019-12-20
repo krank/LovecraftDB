@@ -2,182 +2,192 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>LovecraftDB</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>LovecraftDB</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <script src="https://kit.fontawesome.com/ab420e9236.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/ab420e9236.js" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="dist/css/style.css">
+  <link rel="stylesheet" href="dist/css/style.css">
 
-    <script defer src="dist/bundle.js"></script>
+  <script defer src="dist/bundle.js"></script>
 </head>
 
 <body>
-    <section class="toolbar">
-        <section class="document-links">
-            <button title="Get text from Wikisource" type="button" class="wikisource">
-                <img src="media/32px-Wikisource-logo.svg.webp">
-                <span>Get text from Wikisource</span>
-            </button>
-            <button title="Find names" type="button" class="find-names"><span>Find names</span></button>
-        </section>
-
-        <section class="file-management">
-            <button title="Clear all fields" type="button" class="clear"><span>Clear all fields</span></button>
-            <button title="Save as XML" type="button" class="export"><span>Save as XML</span></button>
-            <button title="Load XML" type="button" class="import"><span>Load XML</span></button>
-        </section>
+  <section class="toolbar">
+    <section class="document-links">
+      <button title="Get text from Wikisource" type="button" class="wikisource">
+        <img src="media/32px-Wikisource-logo.svg.webp">
+        <span>Get text from Wikisource</span>
+      </button>
+      <button title="Find names" type="button" class="find-names"><span>Find names</span></button>
     </section>
 
+    <section class="file-management">
+      <button title="Clear all fields" type="button" class="clear"><span>Clear all fields</span></button>
+      <button title="Save as XML" type="button" class="export"><span>Save as XML</span></button>
+      <button title="Load XML" type="button" class="import"><span>Load XML</span></button>
+    </section>
+  </section>
 
 
-    <main>
-        <h2 class="summary-heading">Summary</h2>
-        <textarea class="summary"></textarea>
-        <h2 class="text-heading">Full text</h2>
-        <textarea class="text"></textarea>
-    </main>
 
-    <section class="metadata">
-        <section class="publication_info">
-            <h2>Publication info</h2>
-            <label class="title">
-                <span>Title</span>
-                <input type="text" name="title">
-            </label>
-            <label class="author">
-                <span>Author</span>
-                <input type="text" name="author">
-            </label>
-            <label class="written">
-                <span>Written date</span>
-                <input type="text" name="written">
-            </label>
-            <label class="published">
-                <span>Published date</span>
-                <input type="text" name="published">
-            </label>
-        </section>
+  <main>
+    <section class="summary">
+      <h2 class="summary-heading">Summary</h2>
+      <textarea class="summary"></textarea>
+    </section>
+    <section class="fulltext">
+      <h2 class="text-heading">Full text</h2>
 
-        <section class="tags">
-            <h2>Tags</h2>
-            <textarea></textarea>
-        </section>
-        <section class="characters">
-            <h2>Characters</h2>
-            <textarea></textarea>
-        </section>
+        <input type="radio" id="code" name="fulltext" checked>
+        <input type="radio" id="html" name="fulltext">
 
-        <section class="creatures">
-            <h2>Creatures</h2>
-            <textarea></textarea>
-        </section>
+          <label class="tab" for="code">Code</label>
+          <label class="tab" for="html">Rich text</label>
 
-        <section class="books">
-            <h2>Books</h2>
-            <textarea></textarea>
-        </section>
+          <textarea class="text"></textarea>
+          <div class="htmltext"></div>
 
-        <section class="locations">
-            <h2>Locations</h2>
-            <textarea></textarea>
-        </section>
+    </section>
+  </main>
 
-        <section class="phobias">
-            <h2>Phobias</h2>
-            <textarea></textarea>
-        </section>
-
-        <section class="notes">
-            <h2>Notes</h2>
-            <textarea></textarea>
-        </section>
-
-        <section class="related-links">
-            <h2>Related links</h2>
-            <textarea></textarea>
-        </section>
+  <section class="metadata">
+    <section class="publication_info">
+      <h2>Publication info</h2>
+      <label class="title">
+        <span>Title</span>
+        <input type="text" name="title">
+      </label>
+      <label class="author">
+        <span>Author</span>
+        <input type="text" name="author">
+      </label>
+      <label class="written">
+        <span>Written date</span>
+        <input type="text" name="written">
+      </label>
+      <label class="published">
+        <span>Published date</span>
+        <input type="text" name="published">
+      </label>
     </section>
 
-    <template class="big dialog">
-        <dialog class="big complex">
-            <section>
-                <form method="dialog">
-                    <header>
-                        <h2>Detected names</h2>
+    <section class="tags">
+      <h2>Tags</h2>
+      <textarea></textarea>
+    </section>
+    <section class="characters">
+      <h2>Characters</h2>
+      <textarea></textarea>
+    </section>
 
-                        <button type="submit" value="cancel" class="fas fa-times"></button>
+    <section class="creatures">
+      <h2>Creatures</h2>
+      <textarea></textarea>
+    </section>
 
-                    </header>
-                </form>
+    <section class="books">
+      <h2>Books</h2>
+      <textarea></textarea>
+    </section>
 
-                <form action="#" class="search-box">
-                    <input class="query" type="text" placeholder="Type your query here…" name="search" minlength="2"
-                        required>
-                    <button type="submit" class="fas fa-search" disabled></button>
-                </form>
+    <section class="locations">
+      <h2>Locations</h2>
+      <textarea></textarea>
+    </section>
 
-                <form method="dialog" class="search-results">
-                    <section class="results">
-                        <ul>
-                        </ul>
-                    </section>
+    <section class="phobias">
+      <h2>Phobias</h2>
+      <textarea></textarea>
+    </section>
 
-                    <section class="buttons">
-                        <button title="Download and append to text" type="submit" value="insert"
-                            class="fas fa-plus">Insert
-                            into lists</button>
-                        <button title="Download and replace current text" type="submit" value="cancel"
-                            class="fas fa-ban">Cancel</button>
-                    </section>
-                </form>
+    <section class="notes">
+      <h2>Notes</h2>
+      <textarea></textarea>
+    </section>
 
-                <template class="submit-button">
-                    <button title="" type="submit" value=""
-                    class="fas"></button>
-                </template>
+    <section class="related-links">
+      <h2>Related links</h2>
+      <textarea></textarea>
+    </section>
+  </section>
 
-                <template class="result-row">
-                    <li>
-                        <label>
-                            <input type="radio" name="title" value="Dagon" required>
-                            <span class="text">Dagon</span>
-                        </label>
-                    </li>
-                </template>
-                <template class="complex-result-row">
-                    <li>
-                        <section class="text description" contenteditable="true">Herbert West, Re-animator</section>
-                        <section class="details">Testy testing</section>
-                        <section class="item-options">
-                        </section>
-                    </li>
-                </template>
-                <template class="complex-result-row option">
-                    <label>
-                        <input type="radio" name="herbert" value="character" required>
-                        <span class="text">Character</span>
-                    </label>
-                </template>
-            </section>
-        </dialog>
-    </template>
-
-    <dialog class="decision">
-        <section>
-            <h2>Title</h2>
-            <p>Text</p>
-        </section>
+  <template class="big dialog">
+    <dialog class="big complex">
+      <section>
         <form method="dialog">
-            <section class="buttons">
-                <button title="Yes" type="submit" value="yes" class="fas fa-check">Yes</button>
-                <button title="No" type="submit" value="no" class="fas fa-times">No</button>
-            </section>
+          <header>
+            <h2>Detected names</h2>
+
+            <button type="submit" value="cancel" class="fas fa-times"></button>
+
+          </header>
         </form>
+
+        <form action="#" class="search-box">
+          <input class="query" type="text" placeholder="Type your query here…" name="search" minlength="2" required>
+          <button type="submit" class="fas fa-search" disabled></button>
+        </form>
+
+        <form method="dialog" class="search-results">
+          <section class="results">
+            <ul>
+            </ul>
+          </section>
+
+          <section class="buttons">
+            <button title="Download and append to text" type="submit" value="insert" class="fas fa-plus">Insert
+              into lists</button>
+            <button title="Download and replace current text" type="submit" value="cancel"
+              class="fas fa-ban">Cancel</button>
+          </section>
+        </form>
+
+        <template class="submit-button">
+          <button title="" type="submit" value="" class="fas"></button>
+        </template>
+
+        <template class="result-row">
+          <li>
+            <label>
+              <input type="radio" name="title" value="Dagon" required>
+              <span class="text">Dagon</span>
+            </label>
+          </li>
+        </template>
+        <template class="complex-result-row">
+          <li>
+            <section class="text description" contenteditable="true">Herbert West, Re-animator</section>
+            <section class="details">Testy testing</section>
+            <section class="item-options">
+            </section>
+          </li>
+        </template>
+        <template class="complex-result-row option">
+          <label>
+            <input type="radio" name="herbert" value="character" required>
+            <span class="text">Character</span>
+          </label>
+        </template>
+      </section>
     </dialog>
+  </template>
+
+  <dialog class="decision">
+    <section>
+      <h2>Title</h2>
+      <p>Text</p>
+    </section>
+    <form method="dialog">
+      <section class="buttons">
+        <button title="Yes" type="submit" value="yes" class="fas fa-check">Yes</button>
+        <button title="No" type="submit" value="no" class="fas fa-times">No</button>
+      </section>
+    </form>
+  </dialog>
 
 </body>
 

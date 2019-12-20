@@ -12,7 +12,7 @@ var buffer = require('vinyl-buffer');
 
 
 gulp.task('sass', function() {
-    return gulp.src('src/**/*.scss')
+    return gulp.src('src/scss/*.scss')
         .pipe(sass())
         .pipe(cleanCSS())
         .pipe(gulp.dest('dist/css'));
