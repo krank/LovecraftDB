@@ -1,5 +1,6 @@
 interface DecisionDialog extends HTMLDialogElement {
   dataString?: string;
+  closeListener?: (event: Event) => void
 }
 
 export function displayDialog(
@@ -17,15 +18,19 @@ export function displayDialog(
   dialogTitle.textContent = title;
   dialogDescription.textContent = description;
 
-  dialog.addEventListener("close", function (event: Event) {
+  dialog.closeListener = function (event: Event) {
     event.preventDefault();
 
     let dialog: DecisionDialog = this as DecisionDialog;
 
+    dialog.removeEventListener("close", dialog.closeListener)
+
     if (this.returnValue == "yes") {
       callback(dialog.dataString);
     }
-  });
+  };
+
+  dialog.addEventListener("close", dialog.closeListener);
 
   dialog.showModal();
 }

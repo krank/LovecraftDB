@@ -1,6 +1,7 @@
 import * as BigDialog from "./bigdialog";
 import * as Interfaces from "./interfaces";
 import * as DomManagement from "./dommanagement";
+import * as TextAreaManagement from "./textareamanagement";
 
 
 interface RegexGroup {
@@ -16,33 +17,9 @@ interface ItemOption {
 }
 
 interface CategoryResult {
-  dataPair: Interfaces.DataBlob;
+  dataBlob: Interfaces.DataBlob;
   content: string[];
 }
-
-/*const itemOptions: ItemOption[] = [
-  {
-    text: "Character",
-    value: "character"
-  },
-  {
-    text: "Entity",
-    value: "entity"
-  },
-  {
-    text: "Location",
-    value: "location"
-  },
-  {
-    text: "Book",
-    value: "book"
-  },
-  {
-    text: "Ignore",
-    value: "ignore",
-    checked: true
-  }
-];*/
 
 function generateItemOptions(Config: Interfaces.DataBlob[]): ItemOption[] {
 
@@ -106,7 +83,7 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
 
       dataBlobs.forEach(dataBlob => {
         categorized[dataBlob.xmlElementChildrenName] = {
-          dataPair: dataBlob,
+          dataBlob: dataBlob,
           content: []
         };
       });
@@ -127,15 +104,15 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
 
       // TODO: Use description text field for name, not merely element's name (which may have changed)
 
-      console.log(categorized);
-
       // Go through the categorized names and append them to their respective textareas
 
       Object.keys(categorized).forEach(categoryName => {
 
         let category = categorized[categoryName];
 
-        let domElements = DomManagement.getHtmlElementOf(category.dataPair, false);
+        TextAreaManagement.addToListelement(category.dataBlob, category.content);
+
+        /*let domElements = DomManagement.getHtmlElementOf(category.dataBlob, false);
 
         let currentTextContent = (domElements.element as HTMLInputElement | HTMLTextAreaElement).value;
 
@@ -147,7 +124,7 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
         } else {
           (domElements.element as HTMLInputElement | HTMLTextAreaElement).value = currentTextContent + "\n" + newTextContent;
           //TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, currentTextContent + "\n" + newTextContent, false);
-        }
+        }*/
       })
 
 
