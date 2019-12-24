@@ -12,6 +12,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^6.0.0-alpha.1",
     "gulp-uglify": "^3.0.2",
+    "sass": "^1.24.0",
     "tsify": "^4.0.1",
     "typescript": "^3.7.3",
     "uglify": "^0.1.5",

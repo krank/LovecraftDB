@@ -3,6 +3,7 @@ import * as XMLHandling from "./modules/xmlhandling";
 import * as FileManagement from "./modules/filemanagement";
 
 import * as FullTextManagement from "./modules/fulltextmanagement";
+import * as RichTextManagement from "./modules/richtextmanagement";
 
 import * as MediaWikiSearch from "./modules/mediawikisearch";
 import * as NameSearch from "./modules/namesearch";
@@ -55,4 +56,5 @@ function setupToolbar() {
 
 setupToolbar();
 
+RichTextManagement.setupRichText();
 XMLHandling.setupXMLValidation(Config.dataBlobs);

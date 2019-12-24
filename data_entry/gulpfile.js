@@ -10,6 +10,7 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var buffer = require('vinyl-buffer');
 
+sass.compiler = require('sass');
 
 gulp.task('sass', function() {
     return gulp.src('src/scss/*.scss')

@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville&display=swap');
+
+div.htmltext {
+  font-family: 'Libre Baskerville';
+  line-height: 1.5em;
+
+  blockquote footer {
+    font-style: italic;
+    margin-top: .25em;
+    text-align: right;
+  }
+
+  div.poem {
+    margin-left: 1em;
+
+    section {
+      margin-top: .5em;
+      margin-bottom: 1em;
+    }
+
+    p {
+      margin-block-start: 0.25em;
+      margin-block-end: 0.25em;
+    }
+
+    p.indent-1 {
+      margin-left: 1em;
+    }
+
+    p.indent-2 {
+      margin-left: 2em;
+    }
+
+    p.indent-3 {
+      margin-left: 3em;
+    }
+
+  }
+
+}

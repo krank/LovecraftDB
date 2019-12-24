@@ -1,9 +1,11 @@
-@charset 'utf-8';
+@use 'aesthetics';
+@use 'richtext';
 
 body {
   margin: 0;
   height: 100vh;
   display: grid;
+
 
   grid-template-columns:
     minmax(0, auto)
@@ -15,12 +17,6 @@ body {
   grid-template-areas:
     ". toolbar meta ."
     ". text meta .";
-
-  background-color: #f5f5f5;
-
-  background-image: url("../../media/tentacles.png"), url("../../media/tentacles.png");
-  background-position: top left, top right;
-  background-repeat: no-repeat;
 }
 
 h2 {
@@ -39,8 +35,6 @@ h2 {
   content: " Invalid XML warning";
   text-transform: uppercase;
 }
-
-/* TABS */
 
 label.tab {
   padding: 0.5em 1em;
@@ -126,8 +120,15 @@ main {
   grid-area: text;
   padding: 0em 2em 3em 2em;
   background-color: #fff;
-  display: flex;
-  flex-direction: column;
+
+  overflow: auto;
+
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: min-content minmax(10em, 1fr);
+
+  /*display: flex;
+  flex-direction: column;*/
 
   textarea {
     display: block;
@@ -139,13 +140,14 @@ main {
     min-height: 4em;
   }
 
-  section {
+  > section {
     display: flex;
     flex-direction: column;
   }
 
   section.fulltext {
     flex-grow: 1;
+    flex-basis: 0;
     display: grid;
     grid-template-columns: auto auto 1fr;
     grid-template-rows: auto auto 1fr;
@@ -160,6 +162,8 @@ main {
 
     div.html-panel {
       border: 1px solid #a9a9a9;
+      overflow: auto;
+      padding: 1em;
     }
 
     /* GRID AREA POSITIONING */
@@ -213,6 +217,16 @@ main {
       flex-grow: 1;
     }
   }
+
+  /*div.htmltext {
+    background-color: green;
+  }
+
+  div.html-panel {
+    background-color: yellow;
+    margin:1em;
+  }*/
+
 }
 
 section.metadata {
