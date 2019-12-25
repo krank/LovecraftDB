@@ -1,3 +1,5 @@
+import * as NameSearch from "./namesearch";
+
 let xslCodeToHTML = `<?xml version="1.0"?>
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -90,7 +92,9 @@ export function setupRichText() {
 
         let newDom = xsltProcessor.transformToDocument(originalContentDom);
 
-        richTextElement.innerHTML = newDom.querySelector("div.body").innerHTML;
+        let textWithMarkedNames = markNames(newDom.querySelector("div.body").innerHTML);
+
+        richTextElement.innerHTML = textWithMarkedNames;
 
       } else if (id == "code") {
         // Or the other...
@@ -101,4 +105,11 @@ export function setupRichText() {
 
   });
 
+}
+
+function markNames(originalText:string): string {
+
+  let resultString:string = originalText.replace(NameSearch.nameRegex, ' <mark class="potential-name">$1</mark>');
+
+  return resultString;
 }

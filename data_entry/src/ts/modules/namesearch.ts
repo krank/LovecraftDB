@@ -1,6 +1,5 @@
 import * as BigDialog from "./bigdialog";
 import * as Interfaces from "./interfaces";
-import * as DomManagement from "./dommanagement";
 import * as TextAreaManagement from "./textareamanagement";
 
 
@@ -20,6 +19,8 @@ interface CategoryResult {
   dataBlob: Interfaces.DataBlob;
   content: string[];
 }
+
+export const nameRegex:RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
 
 function generateItemOptions(Config: Interfaces.DataBlob[]): ItemOption[] {
 
@@ -63,7 +64,6 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
 
   // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
   // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
-  let nameRegex: RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
 
   let possibleNames = findUniqueMatches(text, nameRegex);
 

@@ -1,8 +1,38 @@
 @import url('https://fonts.googleapis.com/css?family=Libre+Baskerville&display=swap');
 
+div.html-panel {
+  input[type=checkbox] {
+    display: none;
+  }
+
+  input[type='checkbox'] + label::before {
+    font-family: "Font Awesome 5 Pro";
+    content: "\f0c8";
+    margin-right: .5em;
+  }
+
+  input[type='checkbox']:checked + label::before {
+    content: "\f14a";
+    font-weight: 900;
+  }
+
+  mark.potential-name {
+    background-color: transparent;
+  }
+
+  input[type='checkbox']:checked ~ div.htmltext mark.potential-name {
+    background-color: antiquewhite;
+  }
+
+}
+
+
 div.htmltext {
   font-family: 'Libre Baskerville';
   line-height: 1.5em;
+  border-top: 1px solid #a9a9a9;
+  margin-top: .5em;
+  padding: 1em 2em;
 
   blockquote footer {
     font-style: italic;
