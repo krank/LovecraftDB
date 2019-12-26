@@ -9,7 +9,6 @@ export function addToListelement(dataBlob: Interfaces.DataBlob, newContent: stri
   let originalText: string = element.value;
 
   let originalContentArray: string[] = originalText == "" ? [] : originalText.split("\n");
-  console.log(originalContentArray);
 
   if (!force) {
 

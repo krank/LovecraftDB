@@ -1,6 +1,11 @@
 @use 'aesthetics';
 @use 'richtext';
 
+$character-icon: "\f007"; // user
+$entity-icon: "\f67b"; // pastafarianism
+$location-icon: "\f015"; // home
+$book-icon: "\f02d"; // book
+
 body {
   margin: 0;
   height: 100vh;
@@ -233,6 +238,47 @@ main {
 
 }
 
+div.selection-toolbar {
+  position: absolute;
+
+  ul {
+    list-style-type: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+    display:flex;
+
+    button {
+      font-family: "Font Awesome 5 Pro";
+      font-weight: 900;
+      font-size: 1.5em;
+      padding: .3em;
+      width: 2em;
+    }
+
+    button[value="character"]::before {
+      content: $character-icon;
+    }
+
+    button[value="entity"]::before {
+      content: $entity-icon;
+    }
+
+    button[value="book"]::before {
+      content: $book-icon;
+    }
+
+    button[value="location"]::before {
+      content: $location-icon;
+    }
+
+  }
+
+}
+
+
+
+
 section.metadata {
   grid-area: meta;
 
@@ -456,23 +502,23 @@ label:hover input[type="radio"] ~ span.text::before {
 }
 
 input[type="radio"][value="character"] ~ span.text::before {
-  content: "";
+  content: $character-icon;
 }
 
 input[type="radio"][value="entity"] ~ span.text::before {
-  content: "";
+  content: $entity-icon;
 }
 
 input[type="radio"][value="location"] ~ span.text::before {
-  content: "";
+  content: $location-icon;
 }
 
 input[type="radio"][value="book"] ~ span.text::before {
-  content: "";
+  content: $book-icon;
 }
 
 input[type="radio"][value="ignore"] ~ span.text::before {
-  content: "";
+  content: "\f05e"; // ban
 }
 
 @media screen and (max-width: 800px) {

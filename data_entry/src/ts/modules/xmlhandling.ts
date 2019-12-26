@@ -94,8 +94,6 @@ export function makeXML(config: Interfaces.DataBlob[]): string {
   let serializer: XMLSerializer = new XMLSerializer();
   let xmlString = serializer.serializeToString(xmlDocument);
 
-  console.log(xmlString);
-
   return xmlString;
 }
 
@@ -155,13 +153,6 @@ export function Clear(config:Interfaces.DataBlob[]): void {
 
           (domElement.element as HTMLTextAreaElement | HTMLInputElement).value = "";
 
-          /*let elements: NodeListOf<HTMLInputElement | HTMLTextAreaElement> = document.querySelectorAll<
-            HTMLInputElement | HTMLTextAreaElement
-          >(dataBlob.documentElementSelector);
-
-          elements.forEach(element => {
-            element.value = "";
-          });*/
         });
       }
     }

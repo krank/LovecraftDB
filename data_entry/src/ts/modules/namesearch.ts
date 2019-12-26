@@ -46,7 +46,7 @@ function generateItemOptions(Config: Interfaces.DataBlob[]): ItemOption[] {
 }
 
 
-export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
+export function displayDialog(text: string, config: Interfaces.DataBlob[]) {
   const dialog: HTMLDialogElement = BigDialog.setupDialog("Detected names", false, [
     {
       title: "Append names to lists",
@@ -67,7 +67,7 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
 
   let possibleNames = findUniqueMatches(text, nameRegex);
 
-  displayMatches(possibleNames, text, dialog, generateItemOptions(Config));
+  displayMatches(possibleNames, text, dialog, generateItemOptions(config));
 
   // Setup dialog closing action
   dialog.addEventListener("close", function () {
@@ -79,7 +79,7 @@ export function displayDialog(text: string, Config: Interfaces.DataBlob[]) {
 
       let categorized: Record<string, CategoryResult> = {};
 
-      let dataBlobs = Config.filter(pair => pair.containsNames == true);
+      let dataBlobs = config.filter(pair => pair.containsNames == true);
 
       dataBlobs.forEach(dataBlob => {
         categorized[dataBlob.xmlElementChildrenName] = {
