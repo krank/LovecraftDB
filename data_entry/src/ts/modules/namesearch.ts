@@ -51,14 +51,12 @@ export function displayDialog(text: string, config: Interfaces.DataBlob[]) {
     {
       title: "Append names to lists",
       text: "Append",
-      value: "append",
-      classes: ["fas", "fa-list"]
+      value: "append"
     },
     {
       title: "Cancel",
       text: "Cancel",
-      value: "cancel",
-      classes: ["fas", "fa-ban"]
+      value: "cancel"
     }
   ]);
 

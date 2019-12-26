@@ -1,0 +1,33 @@
+@use 'colors';
+@use 'icons';
+
+section.metadata {
+  grid-area: meta;
+
+  background-color: colors.$sidebar-background;
+  padding: 1em 2em 1em 2em;
+  overflow-y: auto;
+
+  label {
+    display: block;
+    margin-bottom: 0.5em;
+    margin-top: 0.25em;
+
+    span {
+      display: block;
+      font-size: 0.75em;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 4em;
+    resize: vertical;
+  }
+}

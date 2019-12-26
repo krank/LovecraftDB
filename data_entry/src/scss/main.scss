@@ -1,10 +1,10 @@
-@use 'aesthetics';
 @use 'richtext';
-
-$character-icon: "\f007"; // user
-$entity-icon: "\f67b"; // pastafarianism
-$location-icon: "\f015"; // home
-$book-icon: "\f02d"; // book
+@use 'colors';
+@use 'icons';
+@use 'metadata';
+@use 'dialogs';
+@use 'inputs';
+@use 'mediaqueries';
 
 body {
   margin: 0;
@@ -22,11 +22,17 @@ body {
   grid-template-areas:
     ". toolbar meta ."
     ". text meta .";
+
+    background-color: colors.$body-background;
+
+    background-image: url("../../media/tentacles.png"), url("../../media/tentacles.png");
+    background-position: top left, top right;
+    background-repeat: no-repeat;
 }
 
-h2 {
+*:not(.htmltext) > h2 {
   font-size: 0.75em;
-  background-color: #cccccc;
+  background-color: colors.$header-background;
   padding: 0.5em;
   margin: 0;
   margin-top: 1em;
@@ -43,10 +49,10 @@ h2 {
 
 label.tab {
   padding: 0.5em 1em;
-  background-color: #cccccc;
+  background-color: colors.$tab-inactive;
   cursor: pointer;
-  border: 1px solid #a9a9a9;
-  border-bottom: 1px solid #ffffff;
+  border: colors.$border;
+  border-bottom: 1px solid colors.$background;
   margin-bottom: -2px;
   margin-left: 0.5em;
   margin-top: 0.5em;
@@ -56,7 +62,9 @@ label.tab {
 section.toolbar {
   grid-area: toolbar;
   padding: 1em 2em 0em 2em;
-  background-color: #fff;
+  background-color: colors.$background;
+
+  z-index: 1;
 
   display: grid;
   grid-template-columns: auto min-content;
@@ -67,10 +75,7 @@ section.toolbar {
 
   button {
     display: flex;
-    background-color: #eeeeee;
-    border: 0;
     padding: 0;
-    cursor: pointer;
     font-size: 1em;
     vertical-align: middle;
     width: 2em;
@@ -83,57 +88,21 @@ section.toolbar {
     }
   }
 
-  button:hover {
-    background-color: #cccccc;
-  }
-
   button:not(:first-of-type) {
     margin-left: 0.25em;
-  }
-
-  button span {
-    height: 1px;
-    width: 1px;
-    position: absolute;
-    overflow: hidden;
-    top: -10px;
-  }
-
-  button::before {
-    font-family: "Font Awesome 5 Pro";
-    font-weight: 700;
-  }
-
-  button.clear::before {
-    content: "";
-  }
-
-  button.export::before {
-    content: "";
-  }
-
-  button.import::before {
-    content: "";
-  }
-
-  button.find-names::before {
-    content: "";
   }
 }
 
 main {
   grid-area: text;
   padding: 0em 2em 3em 2em;
-  background-color: #fff;
+  background-color: colors.$background;
 
   overflow: auto;
 
   display: grid;
   grid-template-columns: auto;
   grid-template-rows: min-content minmax(10em, 1fr);
-
-  /*display: flex;
-  flex-direction: column;*/
 
   textarea {
     display: block;
@@ -163,10 +132,11 @@ main {
 
     textarea.textcode {
       min-height: 8em;
+      padding: 1em;
     }
 
     div.html-panel {
-      border: 1px solid #a9a9a9;
+      border: colors.$border;
       overflow: auto;
       padding: 1em;
     }
@@ -195,6 +165,10 @@ main {
       overflow: auto;
     }
 
+    div.code-panel textarea {
+      flex-grow: 1;
+    }
+
     /* TABS */
 
     input[type="radio"] {
@@ -203,13 +177,13 @@ main {
 
     #code:disabled ~ label[for="code"],
     #html:disabled ~ label[for="html"] {
-      color: #777777;
+      color: colors.$tab-disabled-text;
     }
 
     #code:checked ~ label[for="code"],
     #html:checked ~ label[for="html"] {
-      background-color: #ffffff;
-      z-index: 255;
+      background-color: colors.$tab-active;
+      z-index: 0;
     }
 
     #code:checked ~ div.code-panel,
@@ -221,25 +195,12 @@ main {
     div.html-panel {
       display: none;
     }
-
-    div.code-panel textarea {
-      flex-grow: 1;
-    }
   }
-
-  /*div.htmltext {
-    background-color: green;
-  }
-
-  div.html-panel {
-    background-color: yellow;
-    margin:1em;
-  }*/
 
 }
 
 div.selection-toolbar {
-  position: absolute;
+  position: fixed;
 
   ul {
     list-style-type: none;
@@ -249,323 +210,11 @@ div.selection-toolbar {
     display:flex;
 
     button {
-      font-family: "Font Awesome 5 Pro";
-      font-weight: 900;
       font-size: 1.5em;
       padding: .3em;
       width: 2em;
     }
 
-    button[value="character"]::before {
-      content: $character-icon;
-    }
-
-    button[value="entity"]::before {
-      content: $entity-icon;
-    }
-
-    button[value="book"]::before {
-      content: $book-icon;
-    }
-
-    button[value="location"]::before {
-      content: $location-icon;
-    }
-
   }
 
-}
-
-
-
-
-section.metadata {
-  grid-area: meta;
-
-  background-color: #eeeeee;
-  padding: 1em 2em 1em 2em;
-  overflow-y: auto;
-
-  label {
-    display: block;
-    margin-bottom: 0.5em;
-    margin-top: 0.25em;
-
-    span {
-      display: block;
-      font-size: 0.75em;
-    }
-
-    input {
-      width: 100%;
-      box-sizing: border-box;
-    }
-  }
-
-  textarea {
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 4em;
-    resize: vertical;
-  }
-}
-
-dialog.big {
-  width: 90vw;
-  max-width: 960px;
-  height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0.3em 0.3em 0.3em rgba(243, 222, 222, 0.3);
-  border: none;
-
-  header {
-    display: flex;
-
-    h2 {
-      flex-grow: 1;
-    }
-
-    button {
-      margin-top: 1em;
-      border: none;
-      background-color: #000;
-      color: #fff;
-      cursor: pointer;
-      padding: 0.5em;
-      font-size: 0.75em;
-      width: 2em;
-    }
-
-    button:hover {
-      background-color: #555555;
-    }
-  }
-
-  > section {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  form.search-box {
-    padding: 1em;
-    display: flex;
-
-    input,
-    button {
-      font-size: 1.5em;
-    }
-
-    button {
-      background: #cccccc;
-      border: none;
-      padding: 0.3em;
-    }
-  }
-
-  form.search-box.hidden {
-    display: none;
-  }
-
-  form.search-results {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    margin-top: 1em;
-  }
-
-  section.results {
-    flex-grow: 1;
-    padding-left: 1em;
-    overflow-y: auto;
-
-    label {
-      display: flex;
-      cursor: pointer;
-    }
-
-    label:hover {
-      background-color: #ccc;
-    }
-
-    label span.fas {
-      opacity: 0.2;
-      line-height: 2;
-    }
-
-    input[type="radio"] {
-      display: none;
-    }
-
-    .text {
-      display: flex;
-      line-height: 2em;
-      margin-bottom: 0.25em;
-      padding-right: 0.6em;
-    }
-
-    ul {
-      list-style-type: none;
-      margin-top: 0;
-      margin-right: 1em;
-      padding-left: 0;
-
-      li {
-        display: grid;
-        grid-template-columns: auto min-content;
-        grid-template-areas:
-          "description options"
-          "details details";
-
-        margin-top: 0.25em;
-        border-bottom: 1px solid transparent;
-
-        section.item-options {
-          display: flex;
-        }
-
-        section.description {
-          grid-area: description;
-          margin-bottom: 0;
-        }
-
-        section.details {
-          grid-area: details;
-          font-size: 0.75em;
-          color: #999999;
-          margin-top: -0.25em;
-          visibility: hidden;
-        }
-
-        section.options {
-          grid-area: options;
-        }
-      }
-
-      li:hover {
-        border-bottom: 1px solid black;
-        background-color: #eee;
-
-        section.details {
-          visibility: visible;
-        }
-      }
-    }
-  }
-}
-
-dialog section.buttons {
-  text-align: right;
-  padding-right: 0.5em;
-  border-top: 1px solid #ccc;
-  padding-top: 0.5em;
-  padding-bottom: 1em;
-  flex-shrink: 0;
-
-  button {
-    background-color: transparent;
-    border: 1px solid #ccc;
-    padding: 1em 2em;
-    cursor: pointer;
-    margin-left: 1em;
-  }
-
-  button:disabled {
-    cursor: default;
-  }
-
-  button:not(:disabled):hover {
-    background-color: #ccc;
-  }
-}
-
-dialog section.buttons button::before {
-  margin-right: 0.5em;
-}
-
-input[type="radio"] ~ span.text::before {
-  font-family: "Font Awesome 5 Pro";
-  content: "";
-  font-weight: 900;
-  opacity: 0.2;
-  line-height: 2;
-  width: 2em;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: center;
-}
-
-input[type="radio"]:checked ~ span.text::before,
-label:hover input[type="radio"] ~ span.text::before {
-  opacity: 1;
-}
-
-input[type="radio"][value="character"] ~ span.text::before {
-  content: $character-icon;
-}
-
-input[type="radio"][value="entity"] ~ span.text::before {
-  content: $entity-icon;
-}
-
-input[type="radio"][value="location"] ~ span.text::before {
-  content: $location-icon;
-}
-
-input[type="radio"][value="book"] ~ span.text::before {
-  content: $book-icon;
-}
-
-input[type="radio"][value="ignore"] ~ span.text::before {
-  content: "\f05e"; // ban
-}
-
-@media screen and (max-width: 800px) {
-  body {
-    grid-template-columns: 100%;
-    grid-template-rows: auto 1fr;
-
-    grid-template-areas:
-      "toolbar"
-      "meta"
-      "text";
-  }
-
-  dialog.big section.results section.item-options span.text {
-    width: 2em;
-    overflow: hidden;
-    color: transparent;
-    padding-right: 0;
-  }
-  dialog.big section.results section.item-options span.text::before {
-    color: #000;
-  }
-
-  section.metadata {
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 0.5em;
-    margin-right: 0;
-    overflow-y: visible;
-  }
-
-  section.toolbar {
-    padding-bottom: 1em;
-    top: 0;
-    box-sizing: border-box;
-    position: sticky;
-  }
-
-  main {
-    box-sizing: border-box;
-    padding-left: 1em;
-    padding-right: 1em;
-
-    textarea.textcode {
-      min-height: 20em;
-      resize: vertical;
-    }
-
-  }
 }

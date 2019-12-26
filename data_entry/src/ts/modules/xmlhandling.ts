@@ -142,7 +142,7 @@ export function LoadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
 
 export function Clear(config:Interfaces.DataBlob[]): void {
   DecisionDialog.displayDialog(
-    "Cear all fields",
+    "Clear all fields",
     "Are you sure? This will clear all fields and give you a clean slate.",
     "yes",
     (decision: string) => {

@@ -1,0 +1,89 @@
+@use 'colors';
+@use 'icons';
+
+input[type=checkbox] {
+  display: none;
+}
+
+input[type='checkbox'] + label::before {
+  font-family: "Font Awesome 5 Pro";
+  content: icons.$box;
+  margin-right: .5em;
+}
+
+input[type='checkbox']:checked + label::before {
+  content: icons.$checked-box;
+  font-weight: 900;
+}
+
+
+
+button {
+  background-color: colors.$button-background;
+  border: colors.$button-border;
+  padding: 0.3em;
+  cursor: pointer;
+}
+
+button::before {
+  font-family: "Font Awesome 5 Pro";
+  font-weight: 900;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+button:not(:disabled):hover {
+  background-color: colors.$button-background-hover;
+}
+
+
+
+button span {
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  top: -10px;
+}
+
+button[value="clear"]::before {
+  content: icons.$clear;
+}
+
+button[value="export"]::before {
+  content: icons.$export;
+}
+
+button[value="import"]::before {
+  content: icons.$import;
+}
+
+button[value="find-names"]::before {
+  content: icons.$find-names;
+}
+
+button[value="character"]::before {
+  content: icons.$character;
+}
+
+button[value="entity"]::before {
+  content: icons.$entity;
+}
+
+button[value="book"]::before {
+  content: icons.$book;
+}
+
+button[value="location"]::before {
+  content: icons.$location;
+}
+
+button[value="yes"]::before {
+  content: icons.$affirm;
+}
+
+button[value="no"]::before {
+  content: icons.$deny;
+}

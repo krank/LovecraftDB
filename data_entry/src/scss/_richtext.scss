@@ -1,20 +1,8 @@
+@use 'colors';
+@use 'icons';
 @import url('https://fonts.googleapis.com/css?family=Libre+Baskerville&display=swap');
 
 div.html-panel {
-  input[type=checkbox] {
-    display: none;
-  }
-
-  input[type='checkbox'] + label::before {
-    font-family: "Font Awesome 5 Pro";
-    content: "\f0c8";
-    margin-right: .5em;
-  }
-
-  input[type='checkbox']:checked + label::before {
-    content: "\f14a";
-    font-weight: 900;
-  }
 
   mark.potential-name {
     background-color: transparent;
@@ -30,9 +18,20 @@ div.html-panel {
 div.htmltext {
   font-family: 'Libre Baskerville';
   line-height: 1.5em;
-  border-top: 1px solid #a9a9a9;
+  border-top: colors.$border;
   margin-top: .5em;
   padding: 1em 2em;
+
+  h1, h2 {
+    text-align: center;
+  }
+
+  p:first-of-type::first-letter {
+    float:left;
+    font-size: 4.5em;
+    line-height: 1em;
+    padding-right:.05em;
+  }
 
   blockquote footer {
     font-style: italic;

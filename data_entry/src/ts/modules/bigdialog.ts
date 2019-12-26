@@ -5,7 +5,6 @@ interface ButtonElementInfo {
   text: string;
   value: string;
   title: string;
-  classes: string[];
 }
 
 export function setupDialog(
@@ -53,10 +52,6 @@ function setupSubmitButtons(dialog: HTMLDialogElement, submitButtons: ButtonElem
     submitButtonElement.value = buttonInfo.value;
     submitButtonElement.title = buttonInfo.title;
     submitButtonElement.textContent = buttonInfo.text;
-
-    buttonInfo.classes.forEach(buttonClass => {
-      submitButtonElement.classList.add(buttonClass);
-    });
 
     submitButtonElement.disabled = true;
 

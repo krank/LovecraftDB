@@ -22,13 +22,13 @@
         <img src="media/32px-Wikisource-logo.svg.webp">
         <span>Get text from Wikisource</span>
       </button>
-      <button title="Find names" type="button" class="find-names"><span>Find names</span></button>
+      <button title="Find names" type="button" value="find-names"><span>Find names</span></button>
     </section>
 
     <section class="file-management">
-      <button title="Clear all fields" type="button" class="clear"><span>Clear all fields</span></button>
-      <button title="Save as XML" type="button" class="export"><span>Save as XML</span></button>
-      <button title="Load XML" type="button" class="import"><span>Load XML</span></button>
+      <button title="Clear all fields" type="button" value="clear"><span>Clear all fields</span></button>
+      <button title="Save as XML" type="button" value="export"><span>Save as XML</span></button>
+      <button title="Load XML" type="button" value="import"><span>Load XML</span></button>
     </section>
   </section>
 
@@ -142,7 +142,7 @@
           <header>
             <h2>Detected names</h2>
 
-            <button type="submit" value="cancel" class="fas fa-times"></button>
+            <button type="submit" value="cancel"></button>
 
           </header>
         </form>
@@ -159,15 +159,13 @@
           </section>
 
           <section class="buttons">
-            <button title="Download and append to text" type="submit" value="insert" class="fas fa-plus">Insert
-              into lists</button>
-            <button title="Download and replace current text" type="submit" value="cancel"
-              class="fas fa-ban">Cancel</button>
+            <button title="Download and append to text" type="submit" value="insert">Insert into lists</button>
+            <button title="Download and replace current text" type="submit" value="cancel">Cancel</button>
           </section>
         </form>
 
         <template class="submit-button">
-          <button title="" type="submit" value="" class="fas"></button>
+          <button title="" type="submit" value=""></button>
         </template>
 
         <template class="result-row">
@@ -203,8 +201,8 @@
     </section>
     <form method="dialog">
       <section class="buttons">
-        <button title="Yes" type="submit" value="yes" class="fas fa-check">Yes</button>
-        <button title="No" type="submit" value="no" class="fas fa-times">No</button>
+        <button title="Yes" type="submit" value="yes">Yes</button>
+        <button title="No" type="submit" value="no">No</button>
       </section>
     </form>
   </dialog>

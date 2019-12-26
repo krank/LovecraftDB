@@ -51,14 +51,12 @@ interface RegexpReplacement {
           {
               title: "Download and append to text",
               text: "Append",
-              value: "append",
-              classes: ["fas", "fa-file-medical"]
+              value: "append"
           },
           {
               title: "Download and replace current text",
               text: "Download",
-              value: "replace",
-              classes: ["fas", "fa-file-alt"]
+              value: "replace"
           }
       ]) as WikiDialog;
 

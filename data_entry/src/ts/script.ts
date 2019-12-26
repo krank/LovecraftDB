@@ -19,13 +19,13 @@ function setupToolbar() {
         MediaWikiSearch.displayDialog(title, "https://en.wikisource.org", FullTextManagement.SetTextBody);
     });
 
-    document.querySelector("section.toolbar button.find-names").addEventListener("click", (event: Event) => {
+    document.querySelector("section.toolbar button[value='find-names']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
         NameSearch.displayDialog(FullTextManagement.GetTextBody(), Config.dataBlobs);
     });
 
-    document.querySelector("section.toolbar button.export").addEventListener("click", (event: Event) => {
+    document.querySelector("section.toolbar button[value='export']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
         let xmlString: string = XMLHandling.makeXML(Config.dataBlobs);
@@ -41,13 +41,13 @@ function setupToolbar() {
         FileManagement.saveFile(filename, "text/xml", xmlString);
     });
 
-    document.querySelector("section.toolbar button.import").addEventListener("click", (event: Event) => {
+    document.querySelector("section.toolbar button[value='import']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
         FileManagement.loadFile(XMLHandling.LoadXml, Config.dataBlobs);
     });
 
-    document.querySelector("section.toolbar button.clear").addEventListener("click", (event: Event) => {
+    document.querySelector("section.toolbar button[value='clear']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
         XMLHandling.Clear(Config.dataBlobs);
