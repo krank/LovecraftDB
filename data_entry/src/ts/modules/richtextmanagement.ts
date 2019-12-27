@@ -2,6 +2,7 @@ import * as NameSearch from "./namesearch";
 import * as Interfaces from "./interfaces";
 import * as MetaDataManagement from "./metadatamanagement";
 import * as XmlHandling from "./xmlhandling";
+import * as DomManagement from "./dommanagement";
 
 let mouseDown: boolean = false;
 
@@ -142,6 +143,15 @@ function getSelectionToolbar(createIfNull:boolean): HTMLDivElement {
       });
     })
 
+    let genderButtons:NodeListOf<HTMLButtonElement> = selectionToolbar.querySelectorAll(".gendering button");
+
+    genderButtons.forEach(button => {
+      button.addEventListener("click", (event: Event) => {
+        let gender:string = (event.target as HTMLButtonElement).value;
+        genderSelection(gender);
+      })
+    });
+
   }
 
   return selectionToolbar;
@@ -161,6 +171,46 @@ function addSelectionToList(category: string) {
 
     MetaDataManagement.addToListelement(dataBlob, [range.toString().trim()]);
 
+  }
+
+}
+
+function genderSelection(gender: string) {
+
+  let selection:Selection = document.getSelection();
+  let range:Range = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+  if (range == null) return;
+
+  let startElement = (range.startContainer.parentNode as HTMLElement);
+
+
+  // If we are inside a gendered mark, just remove it
+  if (startElement.tagName == "MARK" && startElement.classList.contains("gendered")) {
+
+    DomManagement.unwrapElement(startElement);
+
+    return;
+  }
+
+  // If a gendered mark is found anywhere inside the range, remove it
+  document.querySelectorAll("div.htmltext mark.gendered").forEach(mark => {
+
+    if (range.intersectsNode(mark)) {
+      DomManagement.unwrapElement(mark as HTMLElement)
+    }
+
+  })
+
+  // Create and wrap gendered mark
+  let genderMark = document.createElement("mark");
+  genderMark.className = `gendered ${gender}`;
+
+  try {
+    range.surroundContents(genderMark);
+  }
+  catch {
+    console.log("Can't add mark there.")
   }
 
 }

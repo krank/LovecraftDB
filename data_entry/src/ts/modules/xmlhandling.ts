@@ -144,7 +144,7 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
   });
 }
 
-export function clear(config:Interfaces.DataBlob[]): void {
+export function clear(config: Interfaces.DataBlob[]): void {
   DecisionDialog.displayDialog(
     "Clear all fields",
     "Are you sure? This will clear all fields and give you a clean slate.",
@@ -163,7 +163,7 @@ export function clear(config:Interfaces.DataBlob[]): void {
   );
 }
 
-export function transformXml(originalDocument:Document, xslString:string): Document {
+export function transformXml(originalDocument: Document, xslString: string): Document {
   let xsltProcessor = new XSLTProcessor();
   let domParser = new DOMParser();
   xsltProcessor.importStylesheet(domParser.parseFromString(xslString, "text/xml"));
@@ -182,7 +182,7 @@ export const xslPrettyXML = `<?xml version="1.0"?>
 </xsl:stylesheet>`;
 
 export const xslCodeToHTML = `<?xml version="1.0"?>
-<xsl:stylesheet version="1.0"
+  <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="body">
       <div class="body"><xsl:apply-templates/></div>
@@ -203,8 +203,7 @@ export const xslCodeToHTML = `<?xml version="1.0"?>
 
     <xsl:template match="gendered">
         <mark class="gendered">
-            <xsl:attribute name="class">gendered
-                <xsl:value-of select="@gender"/>
+            <xsl:attribute name="class">gendered <xsl:value-of select="@gender"/>
             </xsl:attribute>
             <xsl:apply-templates/>
         </mark>

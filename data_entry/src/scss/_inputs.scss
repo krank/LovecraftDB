@@ -87,3 +87,11 @@ button[value="yes"]::before {
 button[value="no"]::before {
   content: icons.$deny;
 }
+
+button[value="female"]::before {
+  content: icons.$female;
+}
+
+button[value="male"]::before {
+  content: icons.$male;
+}

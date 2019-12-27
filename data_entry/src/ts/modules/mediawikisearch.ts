@@ -374,7 +374,7 @@ interface RegexpReplacement {
               const page = pages[Object.keys(pages)[0]];
               if (page.revisions) {
                   const text: string = page.revisions[0].slots.main["*"];
-                  getMetadata(text);
+                  handleMetadata(text);
                   resultHandler(wikiToXML(text), replace); // Actually a call to FullTextManagement.SetBodyText
               }
           });
@@ -382,7 +382,7 @@ interface RegexpReplacement {
       // TODO: Add some error handling here. Catch?
   }
 
-function getMetadata(text:string) {
+function handleMetadata(text:string) {
 
   interface WikiMetaData {
     regex: RegExp,

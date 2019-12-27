@@ -201,6 +201,8 @@ main {
 
 div.selection-toolbar {
   position: fixed;
+  display: flex;
+  background-color: colors.$background;
 
   ul {
     list-style-type: none;
@@ -215,6 +217,10 @@ div.selection-toolbar {
       width: 2em;
     }
 
+  }
+
+  ul:not(:last-child) {
+    margin-right: .5em;
   }
 
 }

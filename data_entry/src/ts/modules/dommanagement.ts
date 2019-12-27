@@ -45,3 +45,13 @@ export function getHtmlElementOf(dataBlob: Interfaces.DataBlob, getWarning: bool
     element: document.querySelector(elementSelector),
     warningElement: getWarning ? document.querySelector(warningSelector) : null  }
 }
+
+export function unwrapElement(element: HTMLElement) {
+  let parent = element.parentNode;
+
+  while (element.firstChild) {
+    parent.insertBefore(element.firstChild, element);
+  }
+  
+  parent.removeChild(element);
+}
