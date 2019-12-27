@@ -44,13 +44,13 @@ function setupToolbar() {
     document.querySelector("section.toolbar button[value='import']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        FileManagement.loadFile(XMLHandling.LoadXml, Config.dataBlobs);
+        FileManagement.loadFile(XMLHandling.loadXml, Config.dataBlobs);
     });
 
     document.querySelector("section.toolbar button[value='clear']").addEventListener("click", (event: Event) => {
         event.preventDefault();
 
-        XMLHandling.Clear(Config.dataBlobs);
+        XMLHandling.clear(Config.dataBlobs);
     });
 }
 

@@ -91,13 +91,17 @@ export function makeXML(config: Interfaces.DataBlob[]): string {
 
   });
 
+  // Prettify using XSL
+  xmlDocument = transformXml(xmlDocument, xslPrettyXML);
+
+  // Serialize
   let serializer: XMLSerializer = new XMLSerializer();
   let xmlString = serializer.serializeToString(xmlDocument);
 
   return xmlString;
 }
 
-export function LoadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
+export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
   let domParser: DOMParser = new DOMParser();
 
   let XmlDocument = domParser.parseFromString(xmlText, "text/xml");
@@ -140,7 +144,7 @@ export function LoadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
   });
 }
 
-export function Clear(config:Interfaces.DataBlob[]): void {
+export function clear(config:Interfaces.DataBlob[]): void {
   DecisionDialog.displayDialog(
     "Clear all fields",
     "Are you sure? This will clear all fields and give you a clean slate.",
@@ -158,3 +162,76 @@ export function Clear(config:Interfaces.DataBlob[]): void {
     }
   );
 }
+
+export function transformXml(originalDocument:Document, xslString:string): Document {
+  let xsltProcessor = new XSLTProcessor();
+  let domParser = new DOMParser();
+  xsltProcessor.importStylesheet(domParser.parseFromString(xslString, "text/xml"));
+  return xsltProcessor.transformToDocument(originalDocument);
+}
+
+export const xslPrettyXML = `<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output omit-xml-declaration="yes" indent="yes"/>
+
+<xsl:template match="node()|@*">
+  <xsl:copy>
+    <xsl:apply-templates select="node()|@*"/>
+  </xsl:copy>
+</xsl:template>
+</xsl:stylesheet>`;
+
+export const xslCodeToHTML = `<?xml version="1.0"?>
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:template match="body">
+      <div class="body"><xsl:apply-templates/></div>
+    </xsl:template>
+
+    <xsl:template match="emph">
+      <em><xsl:apply-templates/></em>
+    </xsl:template>
+
+    <xsl:template match="quote">
+        <blockquote>
+            <xsl:apply-templates/>
+            <footer>
+                <xsl:value-of select="@by"/>
+            </footer>
+        </blockquote>
+    </xsl:template>
+
+    <xsl:template match="gendered">
+        <mark class="gendered">
+            <xsl:attribute name="class">gendered
+                <xsl:value-of select="@gender"/>
+            </xsl:attribute>
+            <xsl:apply-templates/>
+        </mark>
+    </xsl:template>
+
+    <xsl:template match="poem">
+        <div class="poem">
+            <xsl:for-each select="section">
+                <section>
+                    <xsl:for-each select="line">
+                        <p>
+                            <xsl:if test="@indent">
+                                <xsl:attribute name="class">indent-<xsl:value-of select="@indent"/>
+                                </xsl:attribute>
+                            </xsl:if>
+                            <xsl:apply-templates/>
+                        </p>
+                    </xsl:for-each>
+                </section>
+            </xsl:for-each>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="@*|node()">
+      <xsl:copy>
+        <xsl:apply-templates select="@*|node()"/>
+      </xsl:copy>
+    </xsl:template>
+
+</xsl:stylesheet>`;
