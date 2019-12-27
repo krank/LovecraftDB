@@ -1,6 +1,6 @@
 import * as NameSearch from "./namesearch";
 import * as Interfaces from "./interfaces";
-import * as TextAreaManagement from "./textareamanagement";
+import * as MetaDataManagement from "./metadatamanagement";
 import * as XmlHandling from "./xmlhandling";
 
 let mouseDown: boolean = false;
@@ -159,7 +159,7 @@ function addSelectionToList(category: string) {
   if (dataBlobs.length > 0) {
     let dataBlob = dataBlobs[0];
 
-    TextAreaManagement.addToListelement(dataBlob, [range.toString().trim()]);
+    MetaDataManagement.addToListelement(dataBlob, [range.toString().trim()]);
 
   }
 

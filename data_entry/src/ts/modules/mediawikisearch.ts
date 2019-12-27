@@ -1,5 +1,6 @@
 import * as BigDialog from "./bigdialog";
 import * as FormHandling from "./formhandling";
+import * as MetaDataManagement from "./metadatamanagement"
 
 
 interface RegexpReplacement {
@@ -373,10 +374,41 @@ interface RegexpReplacement {
               const page = pages[Object.keys(pages)[0]];
               if (page.revisions) {
                   const text: string = page.revisions[0].slots.main["*"];
-                  const convertedText: string = wikiToXML(text);
-                  resultHandler(wikiToXML(text), replace);
+                  getMetadata(text);
+                  resultHandler(wikiToXML(text), replace); // Actually a call to FullTextManagement.SetBodyText
               }
           });
 
       // TODO: Add some error handling here. Catch?
   }
+
+function getMetadata(text:string) {
+
+  interface WikiMetaData {
+    regex: RegExp,
+    fieldName: string;
+  }
+
+  let metaDataFields:WikiMetaData[] = [
+    {
+      fieldName: "title", 
+      regex: /title *= (.*)/g
+    },
+    {
+      fieldName: "author",
+      regex: /author *= (.*)/g
+    },
+    {
+      fieldName: "published",
+      regex: /year *= (.*)/g
+    }
+  ];
+
+  metaDataFields.forEach(field => {
+    let result = field.regex.exec(text);
+    if (result) {
+      MetaDataManagement.setMetadataField(field.fieldName, result[1]);
+    }
+  })
+
+}

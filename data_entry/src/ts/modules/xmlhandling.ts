@@ -27,7 +27,7 @@ export function setupXMLValidation(config: Interfaces.DataBlob[]): void {
 
       element.warningElement.classList.toggle("xmlwarning", !!testDom.querySelector("parsererror"));
 
-      let exportButtonElement: HTMLButtonElement = document.querySelector(".toolbar button.export");
+      let exportButtonElement: HTMLButtonElement = document.querySelector(".toolbar button[value='export']");
 
       exportButtonElement.disabled = !!testDom.querySelector("parsererror");
     });

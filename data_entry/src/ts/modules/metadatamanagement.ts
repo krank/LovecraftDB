@@ -31,3 +31,15 @@ export function addToListelement(dataBlob: Interfaces.DataBlob, newContent: stri
   element.value = newContentArray.join("\n");
 
 }
+
+export function setMetadataField(field:string, newText:string) {
+
+  let fieldElement:HTMLInputElement = document.querySelector(`section.metadata input[name="${field}"]`);
+
+  console.log(fieldElement);
+
+  if (!fieldElement) return;
+
+  fieldElement.value = newText;
+
+}
