@@ -20,21 +20,6 @@ dialog.big {
     button::before {
       content: icons.$close;
     }
-
-    button {
-      margin-top: 1em;
-      border: none;
-      background-color: colors.$window-bar-icon-background;
-      color: colors.$window-bar-icon-symbol;
-      cursor: pointer;
-      padding: 0.5em;
-      font-size: 0.75em;
-      width: 2em;
-    }
-
-    button:hover {
-      background-color: colors.$window-bar-icon-background-hover;
-    }
   }
 
   > section {
