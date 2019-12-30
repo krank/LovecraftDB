@@ -130,6 +130,10 @@ dialog.big {
   }
 }
 
+dialog::backdrop {
+  backdrop-filter: blur(1em);
+}
+
 dialog section.buttons {
   text-align: right;
   padding-right: 0.5em;
