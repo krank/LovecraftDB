@@ -26,7 +26,7 @@ div.htmltext {
     text-align: center;
   }
 
-  p:first-of-type::first-letter {
+  > p:first-of-type::first-letter {
     float:left;
     font-size: 4.5em;
     line-height: 1em;

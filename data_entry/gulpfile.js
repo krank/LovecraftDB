@@ -33,10 +33,16 @@ gulp.task('typescript', function() {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('xsl', function() {
+  return gulp.src('src/xsl/**/*.xsl')
+    .pipe(gulp.dest('dist/xsl/'));
+})
+
 gulp.task('watch', function() {
     gulp.watch('src/**/*.scss', gulp.series('sass'));
     gulp.watch('src/**/*.ts', gulp.series('typescript'));
+    gulp.watch('src/xsl/**/*.xsl', gulp.series('xsl'));
 });
 
 
-gulp.task('default', gulp.series('sass', 'typescript', 'watch'));
+gulp.task('default', gulp.series('sass', 'typescript', 'xsl', 'watch'));

@@ -2,13 +2,19 @@ import * as DecisionDialog from "./decisiondialog";
 import * as Interfaces from "./interfaces";
 import * as DomManagement from "./dommanagement";
 
+export let xslCodeToHTML:Document;
+export let xslPrettyXML: Document;
+export let xslHTMLToCode: Document;
+
 
 interface XmlValidatableElement extends HTMLElement {
   value: string;
   warningElement: HTMLElement;
 }
 
-export function setupXMLValidation(config: Interfaces.DataBlob[]): void {
+export function setupXML(config: Interfaces.DataBlob[]): void {
+  loadXsltStylesheets();
+
   let domParser: DOMParser = new DOMParser();
   config.forEach(dataBlob => {
 
@@ -32,6 +38,26 @@ export function setupXMLValidation(config: Interfaces.DataBlob[]): void {
       exportButtonElement.disabled = !!testDom.querySelector("parsererror");
     });
   });
+}
+
+function loadXsltStylesheets() {
+
+  xslCodeToHTML = getXsltStylesheet("dist/xsl/codetohtml.xsl");
+
+  xslPrettyXML = getXsltStylesheet("dist/xsl/prettyxml.xsl");
+  xslHTMLToCode = getXsltStylesheet("dist/xsl/htmltocode.xsl");
+
+}
+
+function getXsltStylesheet(filename: string): Document {
+  let xmlHttpRequest:XMLHttpRequest = new XMLHttpRequest();
+
+  xmlHttpRequest.open("GET", filename, false);
+  xmlHttpRequest.send(null);
+
+  console.log(xmlHttpRequest.responseXML);
+
+  return xmlHttpRequest.responseXML;
 }
 
 export function makeXML(config: Interfaces.DataBlob[]): string {
@@ -163,74 +189,20 @@ export function clear(config: Interfaces.DataBlob[]): void {
   );
 }
 
-export function transformXml(originalDocument: Document, xslString: string): Document {
+export function transformXml(originalDocument: Document, xslStylesheet: Document): Document {
+
+  /*console.log("Applying:");
+  console.log(xslStylesheet);
+
+  console.log("To:");
+  console.log(originalDocument);*/
+
   let xsltProcessor = new XSLTProcessor();
-  let domParser = new DOMParser();
-  xsltProcessor.importStylesheet(domParser.parseFromString(xslString, "text/xml"));
-  return xsltProcessor.transformToDocument(originalDocument);
+  xsltProcessor.importStylesheet(xslStylesheet);
+  let result = xsltProcessor.transformToDocument(originalDocument);
+
+  /*console.log("Result:");
+  console.log(result);*/
+
+  return result;
 }
-
-export const xslPrettyXML = `<?xml version="1.0"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<xsl:output omit-xml-declaration="yes" indent="yes"/>
-
-<xsl:template match="node()|@*">
-  <xsl:copy>
-    <xsl:apply-templates select="node()|@*"/>
-  </xsl:copy>
-</xsl:template>
-</xsl:stylesheet>`;
-
-export const xslCodeToHTML = `<?xml version="1.0"?>
-  <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:template match="body">
-      <div class="body"><xsl:apply-templates/></div>
-    </xsl:template>
-
-    <xsl:template match="emph">
-      <em><xsl:apply-templates/></em>
-    </xsl:template>
-
-    <xsl:template match="quote">
-        <blockquote>
-            <xsl:apply-templates/>
-            <footer>
-                <xsl:value-of select="@by"/>
-            </footer>
-        </blockquote>
-    </xsl:template>
-
-    <xsl:template match="gendered">
-        <mark class="gendered">
-            <xsl:attribute name="class">gendered <xsl:value-of select="@gender"/>
-            </xsl:attribute>
-            <xsl:apply-templates/>
-        </mark>
-    </xsl:template>
-
-    <xsl:template match="poem">
-        <div class="poem">
-            <xsl:for-each select="section">
-                <section>
-                    <xsl:for-each select="line">
-                        <p>
-                            <xsl:if test="@indent">
-                                <xsl:attribute name="class">indent-<xsl:value-of select="@indent"/>
-                                </xsl:attribute>
-                            </xsl:if>
-                            <xsl:apply-templates/>
-                        </p>
-                    </xsl:for-each>
-                </section>
-            </xsl:for-each>
-        </div>
-    </xsl:template>
-
-    <xsl:template match="@*|node()">
-      <xsl:copy>
-        <xsl:apply-templates select="@*|node()"/>
-      </xsl:copy>
-    </xsl:template>
-
-</xsl:stylesheet>`;

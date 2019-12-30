@@ -57,4 +57,4 @@ function setupToolbar() {
 setupToolbar();
 
 RichTextManagement.setupRichText(Config.dataBlobs);
-XMLHandling.setupXMLValidation(Config.dataBlobs);
+XMLHandling.setupXML(Config.dataBlobs);

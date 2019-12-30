@@ -37,8 +37,23 @@ export function setupRichText(config:Interfaces.DataBlob[]) {
         richTextElement.innerHTML = textWithMarkedNames;
 
       } else if (id == "code") {
-        // Or the other... (For future, when gendering has been added)
+        // Or the other...
 
+        let originalContentString: string = `<work>${richTextElement.innerHTML}</work>`;
+        let originalContentDom: Document = domParser.parseFromString(originalContentString, "text/xml");
+
+        let newDom = XmlHandling.transformXml(originalContentDom, XmlHandling.xslHTMLToCode);
+
+        let xmlSerializer:XMLSerializer = new XMLSerializer();
+
+        let workRegex: RegExp = /^\<work\>|^\<work\/\>|\<\/work\>$/g
+        let newlineRegexp: RegExp = /(\<poem\>|\<section\>|\<\/section\>|\<\/line\>)\n?/g
+
+        let resultString: string = xmlSerializer.serializeToString(newDom);
+        resultString = resultString.replace(workRegex, "");
+        resultString = resultString.replace(newlineRegexp, "$1\n");
+
+        codeElement.value = resultString;
       }
 
     });
