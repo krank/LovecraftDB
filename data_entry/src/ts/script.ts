@@ -5,6 +5,8 @@ import * as FileManagement from "./modules/filemanagement";
 import * as FullTextManagement from "./modules/fulltextmanagement";
 import * as RichTextManagement from "./modules/richtextmanagement";
 
+import * as MetadataManagemenrt from "./modules/metadatamanagement";
+
 import * as MediaWikiSearch from "./modules/mediawikisearch";
 import * as NameSearch from "./modules/namesearch";
 
@@ -58,3 +60,4 @@ setupToolbar();
 
 RichTextManagement.setupRichText(Config.dataBlobs);
 XMLHandling.setupXML(Config.dataBlobs);
+MetadataManagemenrt.setupLists();
