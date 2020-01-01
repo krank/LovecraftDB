@@ -10,6 +10,8 @@ export function getHtmlElementOf(dataBlob: Interfaces.DataBlob, getWarning: bool
   let elementSelector: string = "";
   let warningSelector: string = "";
 
+  //console.log("Getting element for " + dataBlob.name);
+
   switch (dataBlob.type) {
     case Interfaces.BlobType.generalMetaData: {
 
@@ -34,11 +36,11 @@ export function getHtmlElementOf(dataBlob: Interfaces.DataBlob, getWarning: bool
     }
   }
 
-  /*console.log(dataBlob.name);
+  /*console.log(dataBlob);
   console.log(elementSelector);
-  console.log(document.querySelector(elementSelector));
+  console.log(document.querySelector(elementSelector));*/
 
-  console.log(warningSelector);
+  /*console.log(warningSelector);
   console.log(document.querySelector(warningSelector));*/
 
   return {

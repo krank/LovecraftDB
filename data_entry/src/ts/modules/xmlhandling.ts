@@ -55,8 +55,6 @@ function getXsltStylesheet(filename: string): Document {
   xmlHttpRequest.open("GET", filename, false);
   xmlHttpRequest.send(null);
 
-  console.log(xmlHttpRequest.responseXML);
-
   return xmlHttpRequest.responseXML;
 }
 
@@ -130,12 +128,10 @@ export function makeXML(config: Interfaces.DataBlob[]): string {
 export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
   let domParser: DOMParser = new DOMParser();
 
-  let XmlDocument = domParser.parseFromString(xmlText, "text/xml");
-
-  console.log(XmlDocument);
+  let xmlDocument = domParser.parseFromString(xmlText, "text/xml");
 
   config.forEach(dataBlob => {
-    let xmlElement = XmlDocument.querySelector(dataBlob.xmlElementName);
+    let xmlElement = xmlDocument.querySelector(dataBlob.xmlElementName);
 
     if (xmlElement) {
       let domElements: DomManagement.BlobDomElements = DomManagement.getHtmlElementOf(dataBlob, false);
@@ -163,11 +159,35 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
         });
 
         documentElement.value = textElements.join("\n");
+      } else if (dataBlob.type == Interfaces.BlobType.main) {
+        
+        let xmlDocument = document.implementation.createDocument(null, "tmp", null);
+
+        xmlDocument.replaceChild(xmlElement, xmlDocument.documentElement);
+
+        xmlDocument = transformXml(xmlDocument, xslPrettyXML);
+
+        documentElement.value = unwrapXml(xmlDocument);
+
       } else {
         documentElement.value = xmlElement.innerHTML;
       }
     }
   });
+}
+
+export function unwrapXml(xmlDocument: Document): string {
+
+  let result = xmlDocument.documentElement.innerHTML;
+
+  let linespaceRegex: RegExp = /^  /gm;
+  let newlineRegex: RegExp = /^\n|\n$/g;
+
+  result = result.replace(linespaceRegex, "");
+  result = result.replace(newlineRegex, "");
+
+  return result;
+  
 }
 
 export function clear(config: Interfaces.DataBlob[]): void {

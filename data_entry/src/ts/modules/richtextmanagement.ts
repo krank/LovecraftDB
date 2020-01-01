@@ -44,14 +44,9 @@ export function setupRichText(config:Interfaces.DataBlob[]) {
 
         let newDom = XmlHandling.transformXml(originalContentDom, XmlHandling.xslHTMLToCode);
 
-        let xmlSerializer:XMLSerializer = new XMLSerializer();
+        newDom = XmlHandling.transformXml(newDom, XmlHandling.xslPrettyXML);
 
-        let workRegex: RegExp = /^\<work\>|^\<work\/\>|\<\/work\>$/g
-        let newlineRegexp: RegExp = /(\<poem\>|\<section\>|\<\/section\>|\<\/line\>)\n?/g
-
-        let resultString: string = xmlSerializer.serializeToString(newDom);
-        resultString = resultString.replace(workRegex, "");
-        resultString = resultString.replace(newlineRegexp, "$1\n");
+        let resultString: string = XmlHandling.unwrapXml(newDom);
 
         codeElement.value = resultString;
       }
@@ -70,7 +65,6 @@ export function setupRichText(config:Interfaces.DataBlob[]) {
   });
 
   document.addEventListener("selectionchange", richTextSelectionHandler);
-
 }
 
 function markNames(originalText: string): string {
@@ -90,7 +84,6 @@ function richTextSelectionHandler(event: Event) {
   } else {
     displayRichTextSelectionToolbar();
   }
-
 }
 
 function displayRichTextSelectionToolbar() {
@@ -185,9 +178,7 @@ function addSelectionToList(category: string) {
     let dataBlob = dataBlobs[0];
 
     MetaDataManagement.addToListelement(dataBlob, [range.toString().trim()]);
-
   }
-
 }
 
 function genderSelection(gender: string) {
@@ -227,5 +218,4 @@ function genderSelection(gender: string) {
   catch {
     console.log("Can't add mark there.")
   }
-
 }
