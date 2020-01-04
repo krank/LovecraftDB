@@ -20,6 +20,8 @@ interface CategoryResult {
   content: string[];
 }
 
+// Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
+// And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
 export const nameRegex:RegExp = /(?<![\.;:!?] *) (?:<emph>)?((?:[A-Z][\wéáà]+ ?)+),?/g;
 
 function generateItemOptions(Config: Interfaces.DataBlob[]): ItemOption[] {
@@ -59,9 +61,6 @@ export function displayDialog(text: string, config: Interfaces.DataBlob[]) {
       value: "cancel"
     }
   ]);
-
-  // Regex: One or more words each beginning with a capital letter and bookended by a non-letter.
-  // And the entire group may be preceded by an emph tag but NOT punctuation (so capitalized words at the beginning of sentences are excluded)
 
   let possibleNames = findUniqueMatches(text, nameRegex);
 
@@ -110,19 +109,6 @@ export function displayDialog(text: string, config: Interfaces.DataBlob[]) {
 
         MetaDataManagement.addToListelement(category.dataBlob, category.content);
 
-        /*let domElements = DomManagement.getHtmlElementOf(category.dataBlob, false);
-
-        let currentTextContent = (domElements.element as HTMLInputElement | HTMLTextAreaElement).value;
-
-        let newTextContent = category.content.join("\n");
-
-        if (currentTextContent.length == 0) {
-          (domElements.element as HTMLInputElement | HTMLTextAreaElement).value = newTextContent;
-          //TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, newTextContent, false);
-        } else {
-          (domElements.element as HTMLInputElement | HTMLTextAreaElement).value = currentTextContent + "\n" + newTextContent;
-          //TextAreaManagement.setTextareaContents(category.dataPair.documentElementSelector, currentTextContent + "\n" + newTextContent, false);
-        }*/
       })
 
 

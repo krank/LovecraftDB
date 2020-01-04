@@ -374,7 +374,9 @@ interface RegexpReplacement {
               const page = pages[Object.keys(pages)[0]];
               if (page.revisions) {
                   const text: string = page.revisions[0].slots.main["*"];
-                  handleMetadata(text);
+                  if (replace) {
+                    handleMetadata(text);
+                  }
                   resultHandler(wikiToXML(text), replace); // Actually a call to FullTextManagement.SetBodyText
               }
           });

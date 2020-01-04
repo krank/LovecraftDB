@@ -1,9 +1,12 @@
-x <quote by="Virgil"></quote>
-x <p></p>
-x <emph></emph>
-x <poem></poem>
-x    <line indent=1></line>
-x     <section></section>
-x <gendered gender="male"></gendered>
-x <h1></h1>
-x <h2></h2>
+<quote by="Virgil"></quote>
+<p></p>
+<emph></emph>
+<poem></poem>
+   <line indent=1></line>
+    <section></section>
+<gendered gender="male"></gendered>
+<h1></h1>
+<h2></h2>
+<ul></ul>
+<ol></ul>
+  <li></li>
