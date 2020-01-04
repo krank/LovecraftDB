@@ -1,4 +1,4 @@
-import * as FormHandling from "./formhandling";
+import * as FormHandling from "./forms";
 
 
 interface ButtonElementInfo {

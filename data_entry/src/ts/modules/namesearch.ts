@@ -1,6 +1,6 @@
 import * as BigDialog from "./bigdialog";
 import * as Interfaces from "./interfaces";
-import * as MetaDataManagement from "./metadatamanagement";
+import * as MetaData from "./metadata";
 
 
 interface RegexGroup {
@@ -107,7 +107,7 @@ export function displayDialog(text: string, config: Interfaces.DataBlob[]) {
 
         let category = categorized[categoryName];
 
-        MetaDataManagement.addToListelement(category.dataBlob, category.content);
+        MetaData.addToListelement(category.dataBlob, category.content);
 
       })
 

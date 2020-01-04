@@ -1,14 +1,14 @@
 import * as NameSearch from "./namesearch";
 import * as Interfaces from "./interfaces";
-import * as MetaDataManagement from "./metadatamanagement";
-import * as XmlHandling from "./xmlhandling";
-import * as DomManagement from "./dommanagement";
+import * as MetaData from "./metadata";
+import * as Xml from "./xml";
+import * as Dom from "./dom";
 
 let mouseDown: boolean = false;
 
 let localConfig: Interfaces.DataBlob[];
 
-export function setupRichText(config:Interfaces.DataBlob[]) {
+export function setup(config:Interfaces.DataBlob[]) {
 
   localConfig = config;
 
@@ -25,28 +25,30 @@ export function setupRichText(config:Interfaces.DataBlob[]) {
       let richTextElement: HTMLDivElement = document.querySelector("div.htmltext");
 
       if (id == "html") {
-        // One way...
+        // One way... (to HTML)
 
         let originalContentString: string = `<body>${codeElement.value}</body>`;
         let originalContentDom: Document = domParser.parseFromString(originalContentString, "text/xml");
 
-        let newDom = XmlHandling.transformXml(originalContentDom, XmlHandling.xslCodeToHTML);
+        let newDom = Xml.transformXml(originalContentDom, Xml.xslCodeToHTML);
 
         let textWithMarkedNames = markNames(newDom.querySelector("div.body").innerHTML);
 
         richTextElement.innerHTML = textWithMarkedNames;
 
       } else if (id == "code") {
-        // Or the other...
+        // Or the other... (to code)
 
         let originalContentString: string = `<work>${richTextElement.innerHTML}</work>`;
         let originalContentDom: Document = domParser.parseFromString(originalContentString, "text/xml");
 
-        let newDom = XmlHandling.transformXml(originalContentDom, XmlHandling.xslHTMLToCode);
+        let newDom = Xml.transformXml(originalContentDom, Xml.xslHTMLToCode);
 
-        newDom = XmlHandling.transformXml(newDom, XmlHandling.xslPrettyXML);
+        newDom = Xml.transformXml(newDom, Xml.xslPrettyXML);
 
-        let resultString: string = XmlHandling.unwrapXml(newDom);
+        let resultString: string = Xml.unwrapXml(newDom);
+
+        
 
         codeElement.value = resultString;
       }
@@ -177,7 +179,7 @@ function addSelectionToList(category: string) {
   if (dataBlobs.length > 0) {
     let dataBlob = dataBlobs[0];
 
-    MetaDataManagement.addToListelement(dataBlob, [range.toString().trim()]);
+    MetaData.addToListelement(dataBlob, [range.toString().trim()]);
   }
 }
 
@@ -194,7 +196,7 @@ function genderSelection(gender: string) {
   // If we are inside a gendered mark, just remove it
   if (startElement.tagName == "MARK" && startElement.classList.contains("gendered")) {
 
-    DomManagement.unwrapElement(startElement);
+    Dom.unwrapElement(startElement);
 
     return;
   }
@@ -203,7 +205,7 @@ function genderSelection(gender: string) {
   document.querySelectorAll("div.htmltext mark.gendered").forEach(mark => {
 
     if (range.intersectsNode(mark)) {
-      DomManagement.unwrapElement(mark as HTMLElement)
+      Dom.unwrapElement(mark as HTMLElement)
     }
 
   })

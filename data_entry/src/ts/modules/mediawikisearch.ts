@@ -1,6 +1,6 @@
 import * as BigDialog from "./bigdialog";
-import * as FormHandling from "./formhandling";
-import * as MetaDataManagement from "./metadatamanagement"
+import * as FormHandling from "./forms";
+import * as MetaData from "./metadata"
 
 
 interface RegexpReplacement {
@@ -409,7 +409,7 @@ function handleMetadata(text:string) {
   metaDataFields.forEach(field => {
     let result = field.regex.exec(text);
     if (result) {
-      MetaDataManagement.setMetadataField(field.fieldName, result[1]);
+      MetaData.setMetadataField(field.fieldName, result[1]);
     }
   })
 

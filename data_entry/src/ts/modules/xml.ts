@@ -1,8 +1,8 @@
 import * as DecisionDialog from "./decisiondialog";
 import * as Interfaces from "./interfaces";
-import * as DomManagement from "./dommanagement";
+import * as Dom from "./dom";
 
-export let xslCodeToHTML:Document;
+export let xslCodeToHTML: Document;
 export let xslPrettyXML: Document;
 export let xslHTMLToCode: Document;
 
@@ -12,13 +12,13 @@ interface XmlValidatableElement extends HTMLElement {
   warningElement: HTMLElement;
 }
 
-export function setupXML(config: Interfaces.DataBlob[]): void {
+export function setup(config: Interfaces.DataBlob[]): void {
   loadXsltStylesheets();
 
   let domParser: DOMParser = new DOMParser();
   config.forEach(dataBlob => {
 
-    let domElements: DomManagement.BlobDomElements = DomManagement.getHtmlElementOf(dataBlob, true);
+    let domElements: Dom.BlobDomElements = Dom.getHtmlElementOf(dataBlob, true);
 
     let element: XmlValidatableElement = domElements.element as XmlValidatableElement;
 
@@ -69,7 +69,7 @@ export function makeXML(config: Interfaces.DataBlob[]): string {
 
     let xmlElement = xmlDocument.createElement(dataBlob.xmlElementName);
 
-    let domElements: DomManagement.BlobDomElements = DomManagement.getHtmlElementOf(dataBlob, false);
+    let domElements: Dom.BlobDomElements = Dom.getHtmlElementOf(dataBlob, false);
 
     let documentElement: HTMLInputElement | HTMLTextAreaElement = domElements.element as HTMLInputElement | HTMLTextAreaElement;
 
@@ -134,7 +134,7 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
     let xmlElement = xmlDocument.querySelector(dataBlob.xmlElementName);
 
     if (xmlElement) {
-      let domElements: DomManagement.BlobDomElements = DomManagement.getHtmlElementOf(dataBlob, false);
+      let domElements: Dom.BlobDomElements = Dom.getHtmlElementOf(dataBlob, false);
       let documentElement: HTMLInputElement | HTMLTextAreaElement = domElements.element as HTMLInputElement | HTMLTextAreaElement;
 
       if (dataBlob.xmlElementChildrenName) {
@@ -199,7 +199,7 @@ export function clear(config: Interfaces.DataBlob[]): void {
       if (decision == "yes") {
         config.forEach(dataBlob => {
 
-          let domElement = DomManagement.getHtmlElementOf(dataBlob, false);
+          let domElement = Dom.getHtmlElementOf(dataBlob, false);
 
           (domElement.element as HTMLTextAreaElement | HTMLInputElement).value = "";
 

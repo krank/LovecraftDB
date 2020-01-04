@@ -1,10 +1,10 @@
 import * as Interfaces from "./interfaces";
-import * as DomManagement from "./dommanagement";
+import * as Dom from "./dom";
 import * as DecisionDialog from "./decisiondialog";
 
 export function addToListelement(dataBlob: Interfaces.DataBlob, newContent: string[], force: boolean = false) {
 
-  let element: HTMLTextAreaElement = DomManagement.getHtmlElementOf(dataBlob, false).element as HTMLTextAreaElement;
+  let element: HTMLTextAreaElement = Dom.getHtmlElementOf(dataBlob, false).element as HTMLTextAreaElement;
 
   let originalText: string = element.value;
 
