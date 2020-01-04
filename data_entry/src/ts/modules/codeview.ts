@@ -1,11 +1,11 @@
 import * as DecisionDialog from "./decisiondialog";
 
-export function SetTextBody(text: string, replace: boolean = true) {
+export function SetTextBody(text: string, replace: boolean = true, force: boolean = false) {
 
   let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.textcode");
 
   if (replace) {
-      if (textBodyElement.value.length != 0) {
+      if (textBodyElement.value.length != 0 && !force) {
           DecisionDialog.displayDialog(
               "Replace",
               "Are you sure? This will mean losing the current text body.",

@@ -3,6 +3,7 @@ import * as Interfaces from "./interfaces";
 import * as MetaData from "./metadata";
 import * as Xml from "./xml";
 import * as Dom from "./dom";
+import * as CodeView from "./codeview";
 
 let mouseDown: boolean = false;
 
@@ -48,9 +49,8 @@ export function setup(config:Interfaces.DataBlob[]) {
 
         let resultString: string = Xml.unwrapXml(newDom);
 
-        
+        CodeView.SetTextBody(resultString, true, true);
 
-        codeElement.value = resultString;
       }
 
     });
