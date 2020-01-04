@@ -4,6 +4,11 @@ export function SetTextBody(text: string, replace: boolean = true, force: boolea
 
   let textBodyElement:HTMLTextAreaElement = document.querySelector("main textarea.textcode");
 
+  // RegExp: a > followed by a newline and a <, which is not the start of a closing tag (</).
+  let extraLinefeedRegexp: RegExp = /\>\n\<(?!\/)/g
+
+  text = text.replace(extraLinefeedRegexp, ">\n\n<");
+
   if (replace) {
       if (textBodyElement.value.length != 0 && !force) {
           DecisionDialog.displayDialog(

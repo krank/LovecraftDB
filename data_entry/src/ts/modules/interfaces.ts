@@ -24,6 +24,7 @@ export interface DataBlob {
   name: string,
   type: BlobType,
   containsNames?: boolean,
+  isFullText?: boolean,
 
   attributePairs?: AttributePair[],
   

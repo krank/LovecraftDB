@@ -1,6 +1,7 @@
 import * as DecisionDialog from "./decisiondialog";
 import * as Interfaces from "./interfaces";
 import * as Dom from "./dom";
+import * as CodeView from "./codeview";
 
 export let xslCodeToHTML: Document;
 export let xslPrettyXML: Document;
@@ -167,7 +168,11 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
 
         xmlDocument = transformXml(xmlDocument, xslPrettyXML);
 
-        documentElement.value = unwrapXml(xmlDocument);
+        if (dataBlob.isFullText) {
+          CodeView.SetTextBody(unwrapXml(xmlDocument), true, true);
+        } else {
+          documentElement.value = unwrapXml(xmlDocument);
+        }
 
       } else {
         documentElement.value = xmlElement.innerHTML;

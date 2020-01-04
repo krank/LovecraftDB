@@ -192,6 +192,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   {
     name: "Full text",
     type: Interfaces.BlobType.main,
+    isFullText: true,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "fulltext",
