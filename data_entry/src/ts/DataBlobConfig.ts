@@ -191,8 +191,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
 
   {
     name: "Full text",
-    type: Interfaces.BlobType.main,
-    isFullText: true,
+    type: Interfaces.BlobType.fulltext,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "fulltext",
@@ -202,7 +201,7 @@ export const dataBlobs: Interfaces.DataBlob[] = [
   },
   {
     name: "Summary",
-    type: Interfaces.BlobType.main,
+    type: Interfaces.BlobType.summary,
 
     documentElementType: Interfaces.DocumentNodeType.textarea,
     documentElementClass: "summary",

@@ -27,7 +27,8 @@ export function getHtmlElementOf(dataBlob: Interfaces.DataBlob, getWarning: bool
 
       break;
     }
-    case Interfaces.BlobType.main: {
+    case Interfaces.BlobType.fulltext:
+    case Interfaces.BlobType.summary: {
 
       elementSelector = `main section.${dataBlob.documentElementClass} textarea`;
       warningSelector = `main section.${dataBlob.documentElementClass} h2`;

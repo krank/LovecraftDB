@@ -6,7 +6,8 @@ export enum DocumentNodeType {
 export enum BlobType {
   generalMetaData, // Author, year etc
   list, // Names, tags etc
-  main // Fulltext, summary
+  fulltext,
+  summary
 }
 
 export interface AttributePair {
@@ -24,7 +25,6 @@ export interface DataBlob {
   name: string,
   type: BlobType,
   containsNames?: boolean,
-  isFullText?: boolean,
 
   attributePairs?: AttributePair[],
   

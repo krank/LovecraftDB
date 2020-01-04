@@ -138,7 +138,7 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
       let domElements: Dom.BlobDomElements = Dom.getHtmlElementOf(dataBlob, false);
       let documentElement: HTMLInputElement | HTMLTextAreaElement = domElements.element as HTMLInputElement | HTMLTextAreaElement;
 
-      if (dataBlob.xmlElementChildrenName) {
+      if (dataBlob.type == Interfaces.BlobType.list) {
         let xmlChildElements: NodeListOf<Element> = xmlElement.querySelectorAll(dataBlob.xmlElementChildrenName);
 
         let textElements: string[] = [];
@@ -160,7 +160,8 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
         });
 
         documentElement.value = textElements.join("\n");
-      } else if (dataBlob.type == Interfaces.BlobType.main) {
+
+      } else if ([Interfaces.BlobType.fulltext, Interfaces.BlobType.summary].indexOf(dataBlob.type) >= 0) {
         
         let xmlDocument = document.implementation.createDocument(null, "tmp", null);
 
@@ -168,13 +169,14 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
 
         xmlDocument = transformXml(xmlDocument, xslPrettyXML);
 
-        if (dataBlob.isFullText) {
+        if (dataBlob.type == Interfaces.BlobType.fulltext) {
           CodeView.SetTextBody(unwrapXml(xmlDocument), true, true);
         } else {
           documentElement.value = unwrapXml(xmlDocument);
         }
 
       } else {
+        console.log(dataBlob.name);
         documentElement.value = xmlElement.innerHTML;
       }
     }
