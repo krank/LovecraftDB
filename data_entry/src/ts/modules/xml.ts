@@ -7,7 +7,6 @@ export let xslCodeToHTML: Document;
 export let xslPrettyXML: Document;
 export let xslHTMLToCode: Document;
 
-
 interface XmlValidatableElement extends HTMLElement {
   value: string;
   warningElement: HTMLElement;
@@ -43,20 +42,24 @@ export function setup(config: Interfaces.DataBlob[]): void {
 
 function loadXsltStylesheets() {
 
-  xslCodeToHTML = getXsltStylesheet("dist/xsl/codetohtml.xsl");
+  fetch("dist/xsl/codetohtml.xsl")
+    .then(response => response.text())
+    .then(response => {
+      xslCodeToHTML = new DOMParser().parseFromString(response, "text/xml");
+    });
 
-  xslPrettyXML = getXsltStylesheet("dist/xsl/prettyxml.xsl");
-  xslHTMLToCode = getXsltStylesheet("dist/xsl/htmltocode.xsl");
+  fetch("dist/xsl/prettyxml.xsl")
+    .then(response => response.text())
+    .then(response => {
+      xslPrettyXML = new DOMParser().parseFromString(response, "text/xml");
+    });
 
-}
+  fetch("dist/xsl/htmltocode.xsl")
+    .then(response => response.text())
+    .then(response => {
+      xslHTMLToCode = new DOMParser().parseFromString(response, "text/xml");
+    });
 
-function getXsltStylesheet(filename: string): Document {
-  let xmlHttpRequest:XMLHttpRequest = new XMLHttpRequest();
-
-  xmlHttpRequest.open("GET", filename, false);
-  xmlHttpRequest.send(null);
-
-  return xmlHttpRequest.responseXML;
 }
 
 export function makeXML(config: Interfaces.DataBlob[]): string {
@@ -162,7 +165,7 @@ export function loadXml(xmlText: string, config: Interfaces.DataBlob[]): void {
         documentElement.value = textElements.join("\n");
 
       } else if ([Interfaces.BlobType.fulltext, Interfaces.BlobType.summary].indexOf(dataBlob.type) >= 0) {
-        
+
         let xmlDocument = document.implementation.createDocument(null, "tmp", null);
 
         xmlDocument.replaceChild(xmlElement, xmlDocument.documentElement);
@@ -194,7 +197,7 @@ export function unwrapXml(xmlDocument: Document): string {
   result = result.replace(newlineRegex, "");
 
   return result;
-  
+
 }
 
 export function clear(config: Interfaces.DataBlob[]): void {
@@ -218,18 +221,14 @@ export function clear(config: Interfaces.DataBlob[]): void {
 
 export function transformXml(originalDocument: Document, xslStylesheet: Document): Document {
 
-  /*console.log("Applying:");
-  console.log(xslStylesheet);
-
-  console.log("To:");
-  console.log(originalDocument);*/
+  if (!xslStylesheet) {
+    console.log("XSL stylesheet not loaded yet");
+    return null;
+  }
 
   let xsltProcessor = new XSLTProcessor();
   xsltProcessor.importStylesheet(xslStylesheet);
   let result = xsltProcessor.transformToDocument(originalDocument);
-
-  /*console.log("Result:");
-  console.log(result);*/
 
   return result;
 }
