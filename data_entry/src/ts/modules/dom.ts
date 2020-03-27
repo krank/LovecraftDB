@@ -37,13 +37,6 @@ export function getHtmlElementOf(dataBlob: Interfaces.DataBlob, getWarning: bool
     }
   }
 
-  /*console.log(dataBlob);
-  console.log(elementSelector);
-  console.log(document.querySelector(elementSelector));*/
-
-  /*console.log(warningSelector);
-  console.log(document.querySelector(warningSelector));*/
-
   return {
     element: document.querySelector(elementSelector),
     warningElement: getWarning ? document.querySelector(warningSelector) : null  }

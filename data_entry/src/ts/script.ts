@@ -60,4 +60,4 @@ setupToolbar();
 
 HtmlView.setup(Config.dataBlobs);
 Xml.setup(Config.dataBlobs);
-MetaData.setupLists();
+MetaData.setupLists(Config.dataBlobs);

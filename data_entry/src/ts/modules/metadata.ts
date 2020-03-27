@@ -44,7 +44,7 @@ export function setMetadataField(field: string, newText: string) {
 
 }
 
-export function setupLists() {
+export function setupLists(config: Interfaces.DataBlob[]) {
 
   document.querySelectorAll(".metadata section header button[value='clean'").forEach(btn => {
     (btn as HTMLButtonElement).addEventListener("click", () => {
@@ -56,6 +56,41 @@ export function setupLists() {
     })
   });
 
+  
+  // Name clicking
+  let nameBlobs:Interfaces.DataBlob[] = config.filter(dataBlob => dataBlob.containsNames);
+
+  nameBlobs.forEach(dataBlob => {
+    
+    let element:HTMLTextAreaElement = Dom.getHtmlElementOf(dataBlob, false).element as HTMLTextAreaElement;
+
+    element.addEventListener("click", (event: Event) => {
+
+      let textAreaElement = event.currentTarget as HTMLTextAreaElement;
+      
+      let line = getCurrentLine(textAreaElement);
+
+
+      console.log(line);
+    })
+
+  });
+
+}
+
+function getCurrentLine(textAreaElement: HTMLTextAreaElement) {
+  let text:string = textAreaElement.value;
+  let cursorStart = textAreaElement.selectionStart;
+
+  let lineStart = Math.max(
+    text.substr(0,cursorStart).lastIndexOf("\n")+1,
+    0
+  );
+
+  let lineEnd = text.substr(cursorStart).indexOf("\n");
+  lineEnd = lineEnd < 0 ? text.length : cursorStart + lineEnd;
+
+  return text.substring(lineStart, lineEnd)
 }
 
 export function cleanList(textarea: HTMLTextAreaElement) {

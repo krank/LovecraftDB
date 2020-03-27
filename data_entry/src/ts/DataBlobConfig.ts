@@ -94,6 +94,13 @@ export const dataBlobs: Interfaces.DataBlob[] = [
         }
       },
       {
+        text: "0",
+        xml: {
+          attribute: "type",
+          value: "narrator"
+        }
+      },
+      {
         text: "1",
         xml: {
           attribute: "type",
